@@ -405,7 +405,7 @@ namespace KTzV2
                             }
                             if (wAvalObs)
                             {
-                                ts.WriteObservations(KTzHeader.CheckAndGetFileName(String.Format("avs_{4}_{0}{1}_{2}{3}.dat", par1Name, Par1[j], par2Name, Par2[i], filePrefix)),
+                                ts.WriteObservations(KTzHeader.CheckAndGetFileName(String.Format("avs_{4}_{0}{1}_{2}{3}", par1Name, Par1[j], par2Name, Par2[i], filePrefix)),
                                     "# avalanches for the following simulation" + Environment.NewLine + KTzProg.GetOutputFileHeader() + "#aval_size", (KTzV2.Data.Header.OutputFileFormat)KTzV2.Data.Header.KTzHeader.GetPar_Int32(KTzParameters.oFileFormat));
                             }
                             mMax[i][j] = ts.mMax;

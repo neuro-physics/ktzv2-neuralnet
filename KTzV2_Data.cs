@@ -48,9 +48,11 @@ namespace KTzV2.Data
             switch (outFileFormat)
             {
                 case KTzV2.Data.Header.OutputFileFormat.txt:
+                    fileName = KTzV2.Data.Header.KTzHeader.CheckAndGetFileName(fileName,".dat");
                     this.WriteObservationsTxt(fileName, header);
                     break;
                 case KTzV2.Data.Header.OutputFileFormat.mat:
+                    fileName = KTzV2.Data.Header.KTzHeader.CheckAndGetFileName(fileName,".mat");
                     this.WriteObservationsMat(fileName, header);
                     break;
                 default:
