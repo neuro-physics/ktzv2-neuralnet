@@ -1,0 +1,1680 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>MatFileHandler</name>
+    </assembly>
+    <members>
+        <member name="T:MatFileHandler.ArrayType">
+            <summary>
+            Type of a Matlab array.
+            </summary>
+        </member>
+        <member name="F:MatFileHandler.ArrayType.MxCell">
+            <summary>
+            Cell array.
+            </summary>
+        </member>
+        <member name="F:MatFileHandler.ArrayType.MxStruct">
+            <summary>
+            Structure array.
+            </summary>
+        </member>
+        <member name="F:MatFileHandler.ArrayType.MxObject">
+            <summary>
+            Matlab object.
+            </summary>
+        </member>
+        <member name="F:MatFileHandler.ArrayType.MxChar">
+            <summary>
+            Character array.
+            </summary>
+        </member>
+        <member name="F:MatFileHandler.ArrayType.MxSparse">
+            <summary>
+            Sparse array.
+            </summary>
+        </member>
+        <member name="F:MatFileHandler.ArrayType.MxDouble">
+            <summary>
+            Double array.
+            </summary>
+        </member>
+        <member name="F:MatFileHandler.ArrayType.MxSingle">
+            <summary>
+            Single array.
+            </summary>
+        </member>
+        <member name="F:MatFileHandler.ArrayType.MxInt8">
+            <summary>
+            Int8 array.
+            </summary>
+        </member>
+        <member name="F:MatFileHandler.ArrayType.MxUInt8">
+            <summary>
+            UInt8 array.
+            </summary>
+        </member>
+        <member name="F:MatFileHandler.ArrayType.MxInt16">
+            <summary>
+            Int16 array.
+            </summary>
+        </member>
+        <member name="F:MatFileHandler.ArrayType.MxUInt16">
+            <summary>
+            UInt16 array.
+            </summary>
+        </member>
+        <member name="F:MatFileHandler.ArrayType.MxInt32">
+            <summary>
+            Int32 array.
+            </summary>
+        </member>
+        <member name="F:MatFileHandler.ArrayType.MxUInt32">
+            <summary>
+            UInt32 array.
+            </summary>
+        </member>
+        <member name="F:MatFileHandler.ArrayType.MxInt64">
+            <summary>
+            Int64 array.
+            </summary>
+        </member>
+        <member name="F:MatFileHandler.ArrayType.MxUInt64">
+            <summary>
+            UInt64 array.
+            </summary>
+        </member>
+        <member name="F:MatFileHandler.ArrayType.MxOpaque">
+            <summary>
+            Undocumented opaque object type.
+            </summary>
+        </member>
+        <member name="T:MatFileHandler.Variable">
+            <summary>
+            Variable flags.
+            </summary>
+        </member>
+        <member name="F:MatFileHandler.Variable.IsLogical">
+            <summary>
+            Indicates a logical array.
+            </summary>
+        </member>
+        <member name="F:MatFileHandler.Variable.IsGlobal">
+            <summary>
+            Indicates a global variable.
+            </summary>
+        </member>
+        <member name="F:MatFileHandler.Variable.IsComplex">
+            <summary>
+            Indicates a complex array.
+            </summary>
+        </member>
+        <member name="T:MatFileHandler.ArrayFlags">
+            <summary>
+            Array properties.
+            </summary>
+        </member>
+        <member name="F:MatFileHandler.ArrayFlags.Class">
+            <summary>
+            Array type.
+            </summary>
+        </member>
+        <member name="F:MatFileHandler.ArrayFlags.Variable">
+            <summary>
+            Variable flags.
+            </summary>
+        </member>
+        <member name="M:MatFileHandler.ArrayFlags.#ctor(MatFileHandler.ArrayType,MatFileHandler.Variable)">
+            <summary>
+            Initializes a new instance of the <see cref="T:MatFileHandler.ArrayFlags"/> struct.
+            </summary>
+            <param name="class_">Array type.</param>
+            <param name="variable">Variable flags.</param>
+        </member>
+        <member name="T:MatFileHandler.SparseArrayFlags">
+            <summary>
+            Sparse array properties.
+            </summary>
+        </member>
+        <member name="F:MatFileHandler.SparseArrayFlags.ArrayFlags">
+            <summary>
+            Usual array properties.
+            </summary>
+        </member>
+        <member name="F:MatFileHandler.SparseArrayFlags.NzMax">
+            <summary>
+            Maximal number of non-zero elements.
+            </summary>
+        </member>
+        <member name="T:MatFileHandler.ComplexOf`1">
+            <summary>
+            A structure representing a complex number where real and imaginary parts are of type T.
+            </summary>
+            <typeparam name="T">Type of real and imaginary parts.</typeparam>
+        </member>
+        <member name="M:MatFileHandler.ComplexOf`1.#ctor(`0,`0)">
+            <summary>
+            Initializes a new instance of the <see cref="T:MatFileHandler.ComplexOf`1"/> struct.
+            </summary>
+            <param name="real">Real part.</param>
+            <param name="imaginary">Imaginary part.</param>
+        </member>
+        <member name="P:MatFileHandler.ComplexOf`1.Real">
+            <summary>
+            Gets real part.
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.ComplexOf`1.Imaginary">
+            <summary>
+            Gets imaginary part.
+            </summary>
+        </member>
+        <member name="M:MatFileHandler.ComplexOf`1.op_Equality(MatFileHandler.ComplexOf{`0},MatFileHandler.ComplexOf{`0})">
+            <summary>
+            Equality operator.
+            </summary>
+            <param name="left">Left argument.</param>
+            <param name="right">Right argument.</param>
+            <returns>True iff the numbers are equal.</returns>
+        </member>
+        <member name="M:MatFileHandler.ComplexOf`1.op_Inequality(MatFileHandler.ComplexOf{`0},MatFileHandler.ComplexOf{`0})">
+            <summary>
+            Equality operator.
+            </summary>
+            <param name="left">Left argument.</param>
+            <param name="right">Right argument.</param>
+            <returns>True iff the numbers are not equal.</returns>
+        </member>
+        <member name="M:MatFileHandler.ComplexOf`1.Equals(MatFileHandler.ComplexOf{`0})">
+            <summary>
+            Equality check.
+            </summary>
+            <param name="other">Another complex number.</param>
+            <returns>True iff the number is equal to another.</returns>
+        </member>
+        <member name="M:MatFileHandler.ComplexOf`1.Equals(System.Object)">
+            <summary>
+            Equality check.
+            </summary>
+            <param name="obj">Another object.</param>
+            <returns>True iff another object is a complex number equal to this.</returns>
+        </member>
+        <member name="M:MatFileHandler.ComplexOf`1.GetHashCode">
+            <summary>
+            Gets has code of the number.
+            </summary>
+            <returns>Hash code.</returns>
+        </member>
+        <member name="T:MatFileHandler.CompressionUsage">
+            <summary>
+            Describes compression usage strategy for writing files.
+            </summary>
+        </member>
+        <member name="F:MatFileHandler.CompressionUsage.Never">
+            <summary>
+            Never use compression.
+            </summary>
+        </member>
+        <member name="F:MatFileHandler.CompressionUsage.Always">
+            <summary>
+            Always use compression.
+            </summary>
+        </member>
+        <member name="T:MatFileHandler.DataBuilder">
+            <summary>
+            Class for building arrays that later can be written to a .mat file.
+            </summary>
+        </member>
+        <member name="M:MatFileHandler.DataBuilder.NewArray``1(System.Int32[])">
+            <summary>
+            Create a new numerical/logical array.
+            </summary>
+            <typeparam name="T">Element type.</typeparam>
+            <param name="dimensions">Dimensions of the array.</param>
+            <returns>An array of given element type and dimensions, initialized by zeros.</returns>
+            <remarks>
+            Possible values of T:
+              Int8, UInt8, Int16, UInt16, Int32, UInt32, Int64, UInt64, Single, Double,
+              ComplexOf&lt;TReal&gt; (where TReal is one of Int8, UInt8, Int16, UInt16, Int32, UInt32, Int64, UInt64, Single),
+              Complex, Boolean.
+            </remarks>
+        </member>
+        <member name="M:MatFileHandler.DataBuilder.NewArray``1(``0[],System.Int32[])">
+            <summary>
+            Create a new numerical/logical array and initialize it with the given data.
+            </summary>
+            <typeparam name="T">Element type.</typeparam>
+            <param name="data">Initial data.</param>
+            <param name="dimensions">Dimensions of the array.</param>
+            <returns>An array of given dimensions, initialized by the provided data.</returns>
+            <remarks>
+            Possible values of T:
+              Int8, UInt8, Int16, UInt16, Int32, UInt32, Int64, UInt64, Single, Double,
+              ComplexOf&lt;TReal&gt; (where TReal is one of Int8, UInt8, Int16, UInt16, Int32, UInt32, Int64, UInt64, Single),
+              Complex, Boolean.
+            </remarks>
+        </member>
+        <member name="M:MatFileHandler.DataBuilder.NewCellArray(System.Int32[])">
+            <summary>
+            Create a new cell array.
+            </summary>
+            <param name="dimensions">Dimensions of the array.</param>
+            <returns>A cell array of given dimensions, consisting of empty arrays.</returns>
+        </member>
+        <member name="M:MatFileHandler.DataBuilder.NewStructureArray(System.Collections.Generic.IEnumerable{System.String},System.Int32[])">
+            <summary>
+            Create a new structure array.
+            </summary>
+            <param name="fields">Names of structure fields.</param>
+            <param name="dimensions">Dimensions of the array.</param>
+            <returns>A structure array of given dimensions with given fields, consisting of empty arrays.</returns>
+        </member>
+        <member name="M:MatFileHandler.DataBuilder.NewCharArray(System.String)">
+            <summary>
+            Create a new character array.
+            </summary>
+            <param name="contents">A string to initialize the array.</param>
+            <returns>A 1xn character array with the given string as contents.</returns>
+        </member>
+        <member name="M:MatFileHandler.DataBuilder.NewCharArray(System.String,System.Int32[])">
+            <summary>
+            Create a new character array of specified dimensions.
+            </summary>
+            <param name="contents">A string to initialize the array.</param>
+            <param name="dimensions">The dimensions of the array.</param>
+            <returns>A character array of given dimensions with the given string as contents.</returns>
+        </member>
+        <member name="M:MatFileHandler.DataBuilder.NewEmpty">
+            <summary>
+            Create a new empty array.
+            </summary>
+            <returns>An empty array.</returns>
+        </member>
+        <member name="M:MatFileHandler.DataBuilder.NewSparseArray``1(System.Int32[])">
+            <summary>
+            Create a new sparse array.
+            </summary>
+            <typeparam name="T">Element type.</typeparam>
+            <param name="dimensions">The dimensions of the array.</param>
+            <returns>An empty sparse array of given type and given dimensions.</returns>
+        </member>
+        <member name="M:MatFileHandler.DataBuilder.NewVariable(System.String,MatFileHandler.IArray,System.Boolean)">
+            <summary>
+            Create a new variable.
+            </summary>
+            <param name="name">Name of the variable.</param>
+            <param name="value">Value of the variable.</param>
+            <param name="isGlobal">Global flag for the variable.</param>
+            <returns>A new variable with given name and value.</returns>
+        </member>
+        <member name="M:MatFileHandler.DataBuilder.NewFile(System.Collections.Generic.IEnumerable{MatFileHandler.IVariable})">
+            <summary>
+            Create a new Matlab file.
+            </summary>
+            <param name="variables">Variables in the file.</param>
+            <returns>A file containing the provided variables.</returns>
+        </member>
+        <member name="T:MatFileHandler.DataElement">
+            <summary>
+            Base class for all data elements in .mat files.
+            </summary>
+        </member>
+        <member name="T:MatFileHandler.DataElementConverter">
+            <summary>
+            Static class for constructing various arrays from raw data elements read from .mat files.
+            </summary>
+        </member>
+        <member name="M:MatFileHandler.DataElementConverter.ConvertToMatSparseArrayOfComplex(MatFileHandler.SparseArrayFlags,System.Int32[],System.String,System.Int32[],System.Int32[],MatFileHandler.DataElement,MatFileHandler.DataElement)">
+            <summary>
+            Construct a complex sparse array.
+            </summary>
+            <param name="flags">Array flags.</param>
+            <param name="dimensions">Array dimensions.</param>
+            <param name="name">Array name.</param>
+            <param name="rowIndex">Row indices.</param>
+            <param name="columnIndex">Denotes index ranges for each column.</param>
+            <param name="data">Real parts of the values.</param>
+            <param name="imaginaryData">Imaginary parts of the values.</param>
+            <returns>A constructed array.</returns>
+        </member>
+        <member name="M:MatFileHandler.DataElementConverter.ConvertToMatSparseArrayOf``1(MatFileHandler.SparseArrayFlags,System.Int32[],System.String,System.Int32[],System.Int32[],MatFileHandler.DataElement)">
+            <summary>
+            Construct a double sparse array or a logical sparse array.
+            </summary>
+            <typeparam name="T">Element type (Double or Boolean).</typeparam>
+            <param name="flags">Array flags.</param>
+            <param name="dimensions">Array dimensions.</param>
+            <param name="name">Array name.</param>
+            <param name="rowIndex">Row indices.</param>
+            <param name="columnIndex">Denotes index ranges for each column.</param>
+            <param name="data">The values.</param>
+            <returns>A constructed array.</returns>
+        </member>
+        <member name="M:MatFileHandler.DataElementConverter.ConvertToMatNumericalArrayOf``1(MatFileHandler.ArrayFlags,System.Int32[],System.String,MatFileHandler.DataElement,MatFileHandler.DataElement)">
+            <summary>
+            Construct a numerical array.
+            </summary>
+            <typeparam name="T">Element type.</typeparam>
+            <param name="flags">Array flags.</param>
+            <param name="dimensions">Array dimensions.</param>
+            <param name="name">Array name.</param>
+            <param name="realData">Real parts of the values.</param>
+            <param name="imaginaryData">Imaginary parts of the values.</param>
+            <returns>A constructed array.</returns>
+            <remarks>
+            Possible values for T: Int8, UInt8, Int16, UInt16, Int32, UInt32, Int64, UInt64, Single, Double,
+              ComplexOf&lt;TReal&gt; (where TReal is one of Int8, UInt8, Int16, UInt16, Int32, UInt32, Int64, UInt64, Single),
+              Complex.
+            </remarks>
+        </member>
+        <member name="T:MatFileHandler.DataElementReader">
+            <summary>
+            Functions for reading data elements from a .mat file.
+            </summary>
+        </member>
+        <member name="M:MatFileHandler.DataElementReader.#ctor(MatFileHandler.SubsystemData)">
+            <summary>
+            Initializes a new instance of the <see cref="T:MatFileHandler.DataElementReader"/> class.
+            </summary>
+            <param name="subsystemData">Reference to file's SubsystemData.</param>
+        </member>
+        <member name="M:MatFileHandler.DataElementReader.Read(System.IO.BinaryReader)">
+            <summary>
+            Read a data element.
+            </summary>
+            <param name="reader">Input reader.</param>
+            <returns>Data element.</returns>
+        </member>
+        <member name="M:MatFileHandler.DataElementReader.ParseOpaqueData(System.UInt32[])">
+            <summary>
+            Parse opaque link data.
+            </summary>
+            <param name="data">Opaque link data.</param>
+            <returns>Dimensions array, links array, class index.</returns>
+        </member>
+        <member name="T:MatFileHandler.DataExtraction">
+            <summary>
+            Functions for extracting values from data elements.
+            </summary>
+        </member>
+        <member name="M:MatFileHandler.DataExtraction.GetDataAsDouble(MatFileHandler.DataElement)">
+            <summary>
+            Convert the contents of the Matlab data element to a sequence of Double values.
+            </summary>
+            <param name="element">Data element.</param>
+            <returns>Contents of the elements, converted to Double.</returns>
+        </member>
+        <member name="M:MatFileHandler.DataExtraction.GetDataAsSingle(MatFileHandler.DataElement)">
+            <summary>
+            Convert the contents of the Matlab data element to a sequence of Single values.
+            </summary>
+            <param name="element">Data element.</param>
+            <returns>Contents of the elements, converted to Single.</returns>
+        </member>
+        <member name="M:MatFileHandler.DataExtraction.GetDataAsInt8(MatFileHandler.DataElement)">
+            <summary>
+            Convert the contents of the Matlab data element to a sequence of Int8 values.
+            </summary>
+            <param name="element">Data element.</param>
+            <returns>Contents of the elements, converted to Int8.</returns>
+        </member>
+        <member name="M:MatFileHandler.DataExtraction.GetDataAsUInt8(MatFileHandler.DataElement)">
+            <summary>
+            Convert the contents of the Matlab data element to a sequence of Uint8 values.
+            </summary>
+            <param name="element">Data element.</param>
+            <returns>Contents of the elements, converted to UInt8.</returns>
+        </member>
+        <member name="M:MatFileHandler.DataExtraction.GetDataAsInt16(MatFileHandler.DataElement)">
+            <summary>
+            Convert the contents of the Matlab data element to a sequence of Int16 values.
+            </summary>
+            <param name="element">Data element.</param>
+            <returns>Contents of the elements, converted to Int16.</returns>
+        </member>
+        <member name="M:MatFileHandler.DataExtraction.GetDataAsUInt16(MatFileHandler.DataElement)">
+            <summary>
+            Convert the contents of the Matlab data element to a sequence of UInt16 values.
+            </summary>
+            <param name="element">Data element.</param>
+            <returns>Contents of the elements, converted to UInt16.</returns>
+        </member>
+        <member name="M:MatFileHandler.DataExtraction.GetDataAsInt32(MatFileHandler.DataElement)">
+            <summary>
+            Convert the contents of the Matlab data element to a sequence of Int32 values.
+            </summary>
+            <param name="element">Data element.</param>
+            <returns>Contents of the elements, converted to Int32.</returns>
+        </member>
+        <member name="M:MatFileHandler.DataExtraction.GetDataAsUInt32(MatFileHandler.DataElement)">
+            <summary>
+            Convert the contents of the Matlab data element to a sequence of UInt32 values.
+            </summary>
+            <param name="element">Data element.</param>
+            <returns>Contents of the elements, converted to UInt32.</returns>
+        </member>
+        <member name="M:MatFileHandler.DataExtraction.GetDataAsInt64(MatFileHandler.DataElement)">
+            <summary>
+            Convert the contents of the Matlab data element to a sequence of Int64 values.
+            </summary>
+            <param name="element">Data element.</param>
+            <returns>Contents of the elements, converted to Int64.</returns>
+        </member>
+        <member name="M:MatFileHandler.DataExtraction.GetDataAsUInt64(MatFileHandler.DataElement)">
+            <summary>
+            Convert the contents of the Matlab data element to a sequence of UInt64 values.
+            </summary>
+            <param name="element">Data element.</param>
+            <returns>Contents of the elements, converted to UInt64.</returns>
+        </member>
+        <member name="M:MatFileHandler.DataExtraction.SbyteToDouble(System.SByte[])">
+            <summary>
+            Convert an array of signed bytes to an array of doubles.
+            </summary>
+            <param name="source">Source array.</param>
+            <returns>Converted array.</returns>
+        </member>
+        <member name="M:MatFileHandler.DataExtraction.ByteToDouble(System.Byte[])">
+            <summary>
+            Convert an array of bytes to an array of doubles.
+            </summary>
+            <param name="source">Source array.</param>
+            <returns>Converted array.</returns>
+        </member>
+        <member name="M:MatFileHandler.DataExtraction.ShortToDouble(System.Int16[])">
+            <summary>
+            Convert an array of shorts to an array of doubles.
+            </summary>
+            <param name="source">Source array.</param>
+            <returns>Converted array.</returns>
+        </member>
+        <member name="M:MatFileHandler.DataExtraction.UshortToDouble(System.UInt16[])">
+            <summary>
+            Convert an array of unsigned shorts to an array of doubles.
+            </summary>
+            <param name="source">Source array.</param>
+            <returns>Converted array.</returns>
+        </member>
+        <member name="M:MatFileHandler.DataExtraction.IntToDouble(System.Int32[])">
+            <summary>
+            Convert an array of integers to an array of doubles.
+            </summary>
+            <param name="source">Source array.</param>
+            <returns>Converted array.</returns>
+        </member>
+        <member name="M:MatFileHandler.DataExtraction.UintToDouble(System.UInt32[])">
+            <summary>
+            Convert an array of unsigned integers to an array of doubles.
+            </summary>
+            <param name="source">Source array.</param>
+            <returns>Converted array.</returns>
+        </member>
+        <member name="M:MatFileHandler.DataExtraction.LongToDouble(System.Int64[])">
+            <summary>
+            Convert an array of longs to an array of doubles.
+            </summary>
+            <param name="source">Source array.</param>
+            <returns>Converted array.</returns>
+        </member>
+        <member name="M:MatFileHandler.DataExtraction.UlongToDouble(System.UInt64[])">
+            <summary>
+            Convert an array of unsigned longs to an array of doubles.
+            </summary>
+            <param name="source">Source array.</param>
+            <returns>Converted array.</returns>
+        </member>
+        <member name="M:MatFileHandler.DataExtraction.FloatToDouble(System.Single[])">
+            <summary>
+            Convert an array of floats to an array of doubles.
+            </summary>
+            <param name="source">Source array.</param>
+            <returns>Converted array.</returns>
+        </member>
+        <member name="T:MatFileHandler.DataTypeExtensions">
+            <summary>
+            Helpers for working with Matlab data types.
+            </summary>
+        </member>
+        <member name="M:MatFileHandler.DataTypeExtensions.Size(MatFileHandler.DataType)">
+            <summary>
+            Get data type size in bytes.
+            </summary>
+            <param name="type">A data type.</param>
+            <returns>Size in bytes.</returns>
+        </member>
+        <member name="T:MatFileHandler.DatetimeAdapter">
+            <summary>
+            A better interface for using datetime objects.
+            </summary>
+        </member>
+        <member name="M:MatFileHandler.DatetimeAdapter.#ctor(MatFileHandler.IArray)">
+            <summary>
+            Initializes a new instance of the <see cref="T:MatFileHandler.DatetimeAdapter"/> class.
+            </summary>
+            <param name="array">Source datetime object.</param>
+        </member>
+        <member name="P:MatFileHandler.DatetimeAdapter.Dimensions">
+            <summary>
+            Gets datetime array dimensions.
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.DatetimeAdapter.Item(System.Int32[])">
+            <summary>
+            Gets values of datetime object at given position in the array converted to <see cref="T:System.DateTimeOffset"/>.
+            </summary>
+            <param name="list">Indices.</param>
+            <returns>Value converted to <see cref="T:System.DateTimeOffset"/>; null if the resulting value is unrepresentable.</returns>
+        </member>
+        <member name="T:MatFileHandler.DimensionCalculator">
+            <summary>
+            Extension method related to dimension calculations.
+            </summary>
+        </member>
+        <member name="M:MatFileHandler.DimensionCalculator.DimFlatten(System.Int32[],System.Int32[])">
+            <summary>
+            Convert a sequence of indices into a single index (according to Matlab rules).
+            </summary>
+            <param name="dimensions">Dimensions of an array.</param>
+            <param name="indices">A sequence of indices.</param>
+            <returns>Index of the corresponding element in the array.</returns>
+        </member>
+        <member name="M:MatFileHandler.DimensionCalculator.NumberOfElements(System.Int32[])">
+            <summary>
+            Calculate the number of elements in an array given its dimensions.
+            </summary>
+            <param name="dimensions">Dimensions of the array.</param>
+            <returns>Total number of elements in an array.</returns>
+        </member>
+        <member name="T:MatFileHandler.DurationAdapter">
+            <summary>
+            A better interface for using duration objects.
+            </summary>
+        </member>
+        <member name="M:MatFileHandler.DurationAdapter.#ctor(MatFileHandler.IArray)">
+            <summary>
+            Initializes a new instance of the <see cref="T:MatFileHandler.DurationAdapter"/> class.
+            </summary>
+            <param name="array">Source duration object.</param>
+        </member>
+        <member name="P:MatFileHandler.DurationAdapter.Dimensions">
+            <summary>
+            Gets duration array dimensions.
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.DurationAdapter.Item(System.Int32[])">
+            <summary>
+            Gets duration object at given position.
+            </summary>
+            <param name="list">Indices.</param>
+            <returns>Value.</returns>
+        </member>
+        <member name="T:MatFileHandler.HandlerException">
+            <summary>
+            Exception related to Matlab data handling.
+            </summary>
+        </member>
+        <member name="M:MatFileHandler.HandlerException.#ctor(System.String,System.Exception)">
+            <summary>
+            Initializes a new instance of the <see cref="T:MatFileHandler.HandlerException"/> class.
+            </summary>
+            <param name="message">Error message.</param>
+            <param name="innerException">Inner exception.</param>
+        </member>
+        <member name="T:MatFileHandler.Header">
+            <summary>
+            Header of a .mat file.
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.Header.Text">
+            <summary>
+            Gets the header text.
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.Header.SubsystemDataOffset">
+            <summary>
+            Gets subsystem data offset.
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.Header.Version">
+            <summary>
+            Gets file version.
+            </summary>
+        </member>
+        <member name="M:MatFileHandler.Header.CreateNewHeader">
+            <summary>
+            Creates a new header for a .mat file.
+            </summary>
+            <returns>A header.</returns>
+        </member>
+        <member name="M:MatFileHandler.Header.Read(System.IO.BinaryReader)">
+            <summary>
+            Read header from file.
+            </summary>
+            <param name="reader">Binary reader.</param>
+            <returns>The header read.</returns>
+        </member>
+        <member name="T:MatFileHandler.IArray">
+            <summary>
+            Parent data accessing interface for all Matlab classes.
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.IArray.IsEmpty">
+            <summary>
+            Gets a value indicating whether the array is empty.
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.IArray.Dimensions">
+            <summary>
+            Gets dimensions of the array.
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.IArray.Count">
+            <summary>
+            Gets the total number of elements in the array.
+            </summary>
+        </member>
+        <member name="M:MatFileHandler.IArray.ConvertToDoubleArray">
+            <summary>
+            Tries to convert the array to an array of Double values.
+            </summary>
+            <returns>Array of values of the array, converted to Double, or null if the conversion is not possible.</returns>
+        </member>
+        <member name="M:MatFileHandler.IArray.ConvertToComplexArray">
+            <summary>
+            Tries to convert the array to an array of Complex values.
+            </summary>
+            <returns>Array of values of the array, converted to Complex, or null if the conversion is not possible.</returns>
+        </member>
+        <member name="T:MatFileHandler.IArrayOf`1">
+            <summary>
+            An interface providing access to array's contents.
+            </summary>
+            <typeparam name="T">Element type.</typeparam>
+            <remarks>
+            Possible values of T
+            * for numerical arrays:
+              Int8, UInt8, Int16, UInt16, Int32, UInt32, Int64, UInt64, Single, Double,
+              ComplexOf&lt;TReal&gt; (where TReal is one of Int8, UInt8, Int16, UInt16, Int32, UInt32, Int64, UInt64, Single),
+              Complex;
+            * for sparse arrays:
+              Double, Complex, Boolean;
+            * for character arrays:
+              UInt8, UInt16, Char;
+            * for logical arrays:
+              Boolean;
+            * for cell arrays:
+              IArray;
+            * for structure arrays:
+              IReadOnlyDictionary&lt;string, IArray&gt;.
+            </remarks>
+        </member>
+        <member name="P:MatFileHandler.IArrayOf`1.Data">
+            <summary>
+            Gets all data as an array.
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.IArrayOf`1.Item(System.Int32[])">
+            <summary>
+            Get an element by index.
+            </summary>
+            <param name="list">Index of the element.</param>
+        </member>
+        <member name="T:MatFileHandler.ICellArray">
+            <summary>
+            Matlab's cell array.
+            </summary>
+        </member>
+        <member name="T:MatFileHandler.ICharArray">
+            <summary>
+            Matlab's character array.
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.ICharArray.String">
+            <summary>
+            Gets the contained string.
+            </summary>
+        </member>
+        <member name="T:MatFileHandler.IMatFile">
+            <summary>
+            An interface for accessing the contents of .mat files.
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.IMatFile.Variables">
+            <summary>
+            Gets a list of variables present in the file.
+            </summary>
+            <remarks>
+            Variables are in the order in which they appear in the .mat file.
+            </remarks>
+        </member>
+        <member name="P:MatFileHandler.IMatFile.Item(System.String)">
+            <summary>
+            Lookup variable by name.
+            </summary>
+            <param name="variableName">Variable name.</param>
+        </member>
+        <member name="T:MatFileHandler.IMatObject">
+            <summary>
+            An interface to access Matlab objects (more precisely, "object arrays").
+            This is very similar to the <see cref="T:MatFileHandler.IStructureArray"/> interface:
+            an object holds fields that you can access, and the name of its class.
+            Additionally, you can treat is as an array of dictionaries mapping
+            field names to contents of fields.
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.IMatObject.ClassName">
+            <summary>
+            Gets the name of object's class.
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.IMatObject.FieldNames">
+            <summary>
+            Gets the names of object's fields.
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.IMatObject.Item(System.String,System.Int32[])">
+            <summary>
+            Access a given field of a given object in the array.
+            </summary>
+            <param name="field">Field name.</param>
+            <param name="list">Index of the object to access.</param>
+            <returns>The value of the field in the selected object.</returns>
+        </member>
+        <member name="T:MatFileHandler.ISparseArrayOf`1">
+            <summary>
+            Matlab's sparse array.
+            </summary>
+            <typeparam name="T">Element type.</typeparam>
+            <remarks>Possible values of T: Double, Complex, Boolean.</remarks>
+        </member>
+        <member name="P:MatFileHandler.ISparseArrayOf`1.Data">
+            <summary>
+            Gets a dictionary mapping indices to values.
+            </summary>
+        </member>
+        <member name="T:MatFileHandler.IStructureArray">
+            <summary>
+            Matlab's structure array.
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.IStructureArray.FieldNames">
+            <summary>
+            Gets a list of all fields in the structure.
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.IStructureArray.Item(System.String,System.Int32[])">
+            <summary>
+            Get value of a given structure's field.
+            </summary>
+            <param name="field">Field name.</param>
+            <param name="list">Index of the element in the structure array.</param>
+        </member>
+        <member name="T:MatFileHandler.IVariable">
+            <summary>
+            An interface for accessing the variable contents.
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.IVariable.Name">
+            <summary>
+            Gets or sets the name of the variable.
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.IVariable.Value">
+            <summary>
+            Gets the value of the variable.
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.IVariable.IsGlobal">
+            <summary>
+            Gets a value indicating whether the variable is global.
+            </summary>
+        </member>
+        <member name="T:MatFileHandler.MatArray">
+            <summary>
+            Base class for various Matlab arrays.
+            </summary>
+        </member>
+        <member name="M:MatFileHandler.MatArray.#ctor(MatFileHandler.ArrayFlags,System.Int32[],System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:MatFileHandler.MatArray"/> class.
+            </summary>
+            <param name="flags">Array properties.</param>
+            <param name="dimensions">Dimensions of the array.</param>
+            <param name="name">Array name.</param>
+        </member>
+        <member name="P:MatFileHandler.MatArray.Dimensions">
+            <inheritdoc />
+        </member>
+        <member name="P:MatFileHandler.MatArray.Name">
+            <summary>
+            Gets the array name.
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.MatArray.Count">
+            <inheritdoc />
+        </member>
+        <member name="P:MatFileHandler.MatArray.IsEmpty">
+            <inheritdoc />
+        </member>
+        <member name="P:MatFileHandler.MatArray.Flags">
+            <summary>
+            Gets properties of the array.
+            </summary>
+        </member>
+        <member name="M:MatFileHandler.MatArray.Empty">
+            <summary>
+            Returns a new empty array.
+            </summary>
+            <returns>Empty array.</returns>
+        </member>
+        <member name="M:MatFileHandler.MatArray.ConvertToDoubleArray">
+            <inheritdoc />
+        </member>
+        <member name="M:MatFileHandler.MatArray.ConvertToComplexArray">
+            <inheritdoc />
+        </member>
+        <member name="T:MatFileHandler.MatCellArray">
+            <summary>
+            Cell array.
+            </summary>
+        </member>
+        <member name="M:MatFileHandler.MatCellArray.#ctor(MatFileHandler.ArrayFlags,System.Int32[],System.String,System.Collections.Generic.IEnumerable{MatFileHandler.IArray})">
+            <summary>
+            Initializes a new instance of the <see cref="T:MatFileHandler.MatCellArray"/> class.
+            </summary>
+            <param name="flags">Array properties.</param>
+            <param name="dimensions">Dimensions of the array.</param>
+            <param name="name">Array name.</param>
+            <param name="elements">Array elements.</param>
+        </member>
+        <member name="P:MatFileHandler.MatCellArray.Data">
+            <inheritdoc />
+        </member>
+        <member name="P:MatFileHandler.MatCellArray.Item(System.Int32[])">
+            <inheritdoc />
+        </member>
+        <member name="T:MatFileHandler.MatCharArrayOf`1">
+            <summary>
+            Character array.
+            </summary>
+            <typeparam name="T">Element type.</typeparam>
+            <remarks>
+            Possible values of T: UInt8 (for UTF-8 encoded arrays), UInt16 (for UTF-16 encoded arrays).
+            </remarks>
+        </member>
+        <member name="M:MatFileHandler.MatCharArrayOf`1.#ctor(MatFileHandler.ArrayFlags,System.Int32[],System.String,`0[],System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:MatFileHandler.MatCharArrayOf`1"/> class.
+            </summary>
+            <param name="flags">Array parameters.</param>
+            <param name="dimensions">Dimensions of the array.</param>
+            <param name="name">Array name.</param>
+            <param name="rawData">Raw data (UTF-8 or UTF-16).</param>
+            <param name="stringData">Contents as a string.</param>
+        </member>
+        <member name="P:MatFileHandler.MatCharArrayOf`1.String">
+            <summary>
+            Gets the contents of the array as a string.
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.MatCharArrayOf`1.MatFileHandler#IArrayOf{System#Char}#Data">
+            <summary>
+            Gets the contents of the array as a char array.
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.MatCharArrayOf`1.MatFileHandler#IArrayOf{System#Char}#Item(System.Int32[])">
+            <summary>
+            Provides access to the characters of the string contents.
+            </summary>
+            <param name="indices">Indices of an element.</param>
+            <returns>Value of the element.</returns>
+        </member>
+        <member name="T:MatFileHandler.MatFile">
+            <summary>
+            .mat file.
+            </summary>
+        </member>
+        <member name="M:MatFileHandler.MatFile.#ctor(System.Collections.Generic.IEnumerable{MatFileHandler.IVariable})">
+            <summary>
+            Initializes a new instance of the <see cref="T:MatFileHandler.MatFile"/> class.
+            </summary>
+            <param name="variables">List of variables.</param>
+        </member>
+        <member name="P:MatFileHandler.MatFile.Variables">
+            <inheritdoc />
+        </member>
+        <member name="P:MatFileHandler.MatFile.Item(System.String)">
+            <inheritdoc />
+        </member>
+        <member name="T:MatFileHandler.MatFileReader">
+            <summary>
+            Class for reading .mat files.
+            </summary>
+        </member>
+        <member name="M:MatFileHandler.MatFileReader.#ctor(System.IO.Stream)">
+            <summary>
+            Initializes a new instance of the <see cref="T:MatFileHandler.MatFileReader"/> class with a stream.
+            </summary>
+            <param name="stream">Input stream.</param>
+        </member>
+        <member name="M:MatFileHandler.MatFileReader.Read">
+            <summary>
+            Reads the contents of a .mat file from the stream.
+            </summary>
+            <returns>Contents of the file.</returns>
+        </member>
+        <member name="M:MatFileHandler.MatFileReader.ReadRawVariables(System.IO.BinaryReader,System.Int64,MatFileHandler.SubsystemData)">
+            <summary>
+            Read a sequence of raw variables from .mat file.
+            </summary>
+            <param name="reader">Reader.</param>
+            <param name="subsystemDataOffset">Offset of subsystem data in the file;
+            we need it because we may encounter it during reading, and
+            the subsystem data should be parsed in a special way.</param>
+            <param name="subsystemData">
+            Link to the current file's subsystem data structure; initially it has dummy value
+            which will be replaced after we parse the whole subsystem data.</param>
+            <returns>List of "raw" variables; the actual variables are constructed from them later.</returns>
+        </member>
+        <member name="M:MatFileHandler.MatFileReader.ReadRawVariables(System.IO.BinaryReader,System.Int64)">
+            <summary>
+            Read raw variables from a .mat file.
+            </summary>
+            <param name="reader">Binary reader.</param>
+            <param name="subsystemDataOffset">Offset to the subsystem data to use (read from the file header).</param>
+            <returns>Raw variables read.</returns>
+        </member>
+        <member name="T:MatFileHandler.MatFileWriter">
+            <summary>
+            Class for writing .mat files.
+            </summary>
+        </member>
+        <member name="M:MatFileHandler.MatFileWriter.#ctor(System.IO.Stream)">
+            <summary>
+            Initializes a new instance of the <see cref="T:MatFileHandler.MatFileWriter"/> class with a stream and default options.
+            </summary>
+            <param name="stream">Output stream.</param>
+        </member>
+        <member name="M:MatFileHandler.MatFileWriter.#ctor(System.IO.Stream,MatFileHandler.MatFileWriterOptions)">
+            <summary>
+            Initializes a new instance of the <see cref="T:MatFileHandler.MatFileWriter"/> class with a stream.
+            </summary>
+            <param name="stream">Output stream.</param>
+            <param name="options">Options to use for file writing.</param>
+        </member>
+        <member name="M:MatFileHandler.MatFileWriter.Write(MatFileHandler.IMatFile)">
+            <summary>
+            Writes a .mat file.
+            </summary>
+            <param name="file">A file to write.</param>
+        </member>
+        <member name="T:MatFileHandler.MatFileWriterOptions">
+            <summary>
+            Options for writing .mat files.
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.MatFileWriterOptions.Default">
+            <summary>
+            Gets default options.
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.MatFileWriterOptions.UseCompression">
+            <summary>
+            Gets or sets a value indicating whether to compress all variables when writing the file.
+            </summary>
+        </member>
+        <member name="T:MatFileHandler.MatNumericalArrayOf`1">
+            <summary>
+            A numerical array.
+            </summary>
+            <typeparam name="T">Element type.</typeparam>
+        </member>
+        <member name="M:MatFileHandler.MatNumericalArrayOf`1.#ctor(MatFileHandler.ArrayFlags,System.Int32[],System.String,`0[])">
+            <summary>
+            Initializes a new instance of the <see cref="T:MatFileHandler.MatNumericalArrayOf`1"/> class.
+            </summary>
+            <param name="flags">Array parameters.</param>
+            <param name="dimensions">Dimensions of the array.</param>
+            <param name="name">Array name.</param>
+            <param name="data">Array contents.</param>
+        </member>
+        <member name="P:MatFileHandler.MatNumericalArrayOf`1.Data">
+            <inheritdoc />
+        </member>
+        <member name="P:MatFileHandler.MatNumericalArrayOf`1.Item(System.Int32[])">
+            <inheritdoc />
+        </member>
+        <member name="M:MatFileHandler.MatNumericalArrayOf`1.ConvertToDoubleArray">
+            <summary>
+            Tries to convert the array to an array of Double values.
+            </summary>
+            <returns>Array of values of the array, converted to Double, or null if the conversion is not possible.</returns>
+        </member>
+        <member name="M:MatFileHandler.MatNumericalArrayOf`1.ConvertToComplexArray">
+            <summary>
+            Tries to convert the array to an array of Complex values.
+            </summary>
+            <returns>Array of values of the array, converted to Complex, or null if the conversion is not possible.</returns>
+        </member>
+        <member name="T:MatFileHandler.MatSparseArrayOf`1">
+            <summary>
+            Sparse array.
+            </summary>
+            <typeparam name="T">Element type.</typeparam>
+            <remarks>Possible values of T: Double, Complex, Boolean.</remarks>
+        </member>
+        <member name="M:MatFileHandler.MatSparseArrayOf`1.#ctor(MatFileHandler.SparseArrayFlags,System.Int32[],System.String,System.Collections.Generic.Dictionary{System.ValueTuple{System.Int32,System.Int32},`0})">
+            <summary>
+            Initializes a new instance of the <see cref="T:MatFileHandler.MatSparseArrayOf`1"/> class.
+            </summary>
+            <param name="flags">Array properties.</param>
+            <param name="dimensions">Dimensions of the array.</param>
+            <param name="name">Array name.</param>
+            <param name="data">Array contents.</param>
+        </member>
+        <member name="P:MatFileHandler.MatSparseArrayOf`1.MatFileHandler#IArrayOf{T}#Data">
+            <inheritdoc />
+        </member>
+        <member name="P:MatFileHandler.MatSparseArrayOf`1.Data">
+            <inheritdoc />
+        </member>
+        <member name="P:MatFileHandler.MatSparseArrayOf`1.Item(System.Int32[])">
+            <inheritdoc />
+        </member>
+        <member name="M:MatFileHandler.MatSparseArrayOf`1.ConvertToDoubleArray">
+            <summary>
+            Tries to convert the array to an array of Double values.
+            </summary>
+            <returns>Array of values of the array, converted to Double, or null if the conversion is not possible.</returns>
+        </member>
+        <member name="M:MatFileHandler.MatSparseArrayOf`1.ConvertToComplexArray">
+            <summary>
+            Tries to convert the array to an array of Complex values.
+            </summary>
+            <returns>Array of values of the array, converted to Complex, or null if the conversion is not possible.</returns>
+        </member>
+        <member name="T:MatFileHandler.MatStructureArray">
+            <summary>
+            Structure array.
+            </summary>
+        </member>
+        <member name="M:MatFileHandler.MatStructureArray.#ctor(MatFileHandler.ArrayFlags,System.Int32[],System.String,System.Collections.Generic.Dictionary{System.String,System.Collections.Generic.List{MatFileHandler.IArray}})">
+            <summary>
+            Initializes a new instance of the <see cref="T:MatFileHandler.MatStructureArray"/> class.
+            </summary>
+            <param name="flags">Array properties.</param>
+            <param name="dimensions">Dimensions of the array.</param>
+            <param name="name">Array name.</param>
+            <param name="fields">Array contents.</param>
+        </member>
+        <member name="P:MatFileHandler.MatStructureArray.FieldNames">
+            <inheritdoc />
+        </member>
+        <member name="P:MatFileHandler.MatStructureArray.Data">
+            <summary>
+            Gets null: not implemented.
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.MatStructureArray.Fields">
+            <summary>
+            Gets a dictionary that maps field names to lists of values.
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.MatStructureArray.Item(System.String,System.Int32[])">
+            <inheritdoc />
+        </member>
+        <member name="P:MatFileHandler.MatStructureArray.MatFileHandler#IArrayOf{System#Collections#Generic#IReadOnlyDictionary{System#String,MatFileHandler#IArray}}#Item(System.Int32[])">
+            <inheritdoc />
+        </member>
+        <member name="T:MatFileHandler.MatStructureArray.MatStructureArrayElement">
+            <summary>
+            Provides access to an element of a structure array by fields.
+            </summary>
+        </member>
+        <member name="M:MatFileHandler.MatStructureArray.MatStructureArrayElement.#ctor(MatFileHandler.MatStructureArray,System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:MatFileHandler.MatStructureArray.MatStructureArrayElement"/> class.
+            </summary>
+            <param name="parent">Parent structure array.</param>
+            <param name="index">Index in the structure array.</param>
+        </member>
+        <member name="P:MatFileHandler.MatStructureArray.MatStructureArrayElement.Count">
+            <summary>
+            Gets the number of fields.
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.MatStructureArray.MatStructureArrayElement.Keys">
+            <summary>
+            Gets a list of all fields.
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.MatStructureArray.MatStructureArrayElement.Values">
+            <summary>
+            Gets a list of all values.
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.MatStructureArray.MatStructureArrayElement.Item(System.String)">
+            <summary>
+            Gets the value of a given field.
+            </summary>
+            <param name="key">Field name.</param>
+            <returns>The corresponding value.</returns>
+        </member>
+        <member name="M:MatFileHandler.MatStructureArray.MatStructureArrayElement.GetEnumerator">
+            <summary>
+            Enumerates fieldstructure/value pairs of the dictionary.
+            </summary>
+            <returns>All field/value pairs in the structure.</returns>
+        </member>
+        <member name="M:MatFileHandler.MatStructureArray.MatStructureArrayElement.System#Collections#IEnumerable#GetEnumerator">
+            <summary>
+            Enumerates field/value pairs of the structure.
+            </summary>
+            <returns>All field/value pairs in the structure.</returns>
+        </member>
+        <member name="M:MatFileHandler.MatStructureArray.MatStructureArrayElement.ContainsKey(System.String)">
+            <summary>
+            Checks if the structure has a given field.
+            </summary>
+            <param name="key">Field name.</param>
+            <returns>True iff the structure has a given field.</returns>
+        </member>
+        <member name="M:MatFileHandler.MatStructureArray.MatStructureArrayElement.TryGetValue(System.String,MatFileHandler.IArray@)">
+            <summary>
+            Tries to get the value of a given field.
+            </summary>
+            <param name="key">Field name.</param>
+            <param name="value">Value (or null if the field is not present).</param>
+            <returns>Success status of the query.</returns>
+        </member>
+        <member name="T:MatFileHandler.MatVariable">
+            <inheritdoc />
+        </member>
+        <member name="M:MatFileHandler.MatVariable.#ctor(MatFileHandler.IArray,System.String,System.Boolean)">
+            <summary>
+            Initializes a new instance of the <see cref="T:MatFileHandler.MatVariable"/> class.
+            </summary>
+            <param name="value">The value of the variable.</param>
+            <param name="name">Variable name.</param>
+            <param name="isGlobal">Indicates if the variable is global.</param>
+        </member>
+        <member name="P:MatFileHandler.MatVariable.Name">
+            <inheritdoc />
+        </member>
+        <member name="P:MatFileHandler.MatVariable.Value">
+            <inheritdoc />
+        </member>
+        <member name="P:MatFileHandler.MatVariable.IsGlobal">
+            <inheritdoc />
+        </member>
+        <member name="T:MatFileHandler.MiNum`1">
+            <summary>
+            A matrix of type T.
+            </summary>
+            <typeparam name="T">Element type.</typeparam>
+        </member>
+        <member name="M:MatFileHandler.MiNum`1.#ctor(`0[])">
+            <summary>
+            Initializes a new instance of the <see cref="T:MatFileHandler.MiNum`1"/> class.
+            </summary>
+            <param name="data">Contents of the matrix.</param>
+        </member>
+        <member name="P:MatFileHandler.MiNum`1.Data">
+            <summary>
+            Gets the contents of the matrix.
+            </summary>
+        </member>
+        <member name="T:MatFileHandler.Opaque">
+            <summary>
+            Matlab "opaque object" structure.
+            If this object appears in the "main" section of the .mat file,
+            it just contains a small data structure pointing to the object's
+            storage in the "subsystem data" portion of the file.
+            In this case, an instance of <see cref="T:MatFileHandler.OpaqueLink"/> class
+            will be created.
+            If this object appears in the "subsystem data" part, it contains
+            the data of all opaque objects in the file, and that is what we
+            put into <see cref="P:MatFileHandler.Opaque.RawData"/> property.
+            </summary>
+        </member>
+        <member name="M:MatFileHandler.Opaque.#ctor(System.String,System.String,System.String,System.Int32[],MatFileHandler.DataElement)">
+            <summary>
+            Initializes a new instance of the <see cref="T:MatFileHandler.Opaque"/> class.
+            </summary>
+            <param name="name">Name of the object.</param>
+            <param name="typeDescription">Type description.</param>
+            <param name="className">Class name.</param>
+            <param name="dimensions">Dimensions of the object.</param>
+            <param name="rawData">Raw object's data.</param>
+        </member>
+        <member name="P:MatFileHandler.Opaque.ClassName">
+            <summary>
+            Gets class name of the opaque object.
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.Opaque.RawData">
+            <summary>
+            Gets raw object's data: either links to subsystem data, or actual data.
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.Opaque.TypeDescription">
+            <summary>
+            Gets "type description" of the opaque object.
+            </summary>
+        </member>
+        <member name="M:MatFileHandler.Opaque.ConvertToComplexArray">
+            <inheritdoc />
+        </member>
+        <member name="M:MatFileHandler.Opaque.ConvertToDoubleArray">
+            <inheritdoc />
+        </member>
+        <member name="T:MatFileHandler.OpaqueLink">
+            <summary>
+            Implementation of Matlab's "opaque objects" via links to subsystem data.
+            </summary>
+        </member>
+        <member name="M:MatFileHandler.OpaqueLink.#ctor(System.String,System.String,System.String,System.Int32[],MatFileHandler.DataElement,System.Int32[],System.Int32,MatFileHandler.SubsystemData)">
+            <summary>
+            Initializes a new instance of the <see cref="T:MatFileHandler.OpaqueLink"/> class.
+            </summary>
+            <param name="name">Name of the object.</param>
+            <param name="typeDescription">Description of object's class.</param>
+            <param name="className">Name of the object's class.</param>
+            <param name="dimensions">Dimensions of the object.</param>
+            <param name="data">Raw data containing links to object's storage.</param>
+            <param name="indexToObjectId">Links to object's storage.</param>
+            <param name="classIndex">Index of object's class.</param>
+            <param name="subsystemData">Reference to global subsystem data.</param>
+        </member>
+        <member name="P:MatFileHandler.OpaqueLink.ClassIndex">
+            <summary>
+            Gets index of this object's class in subsystem data class list.
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.OpaqueLink.Data">
+            <inheritdoc />
+        </member>
+        <member name="P:MatFileHandler.OpaqueLink.FieldNames">
+            <inheritdoc />
+        </member>
+        <member name="P:MatFileHandler.OpaqueLink.IndexToObjectId">
+            <summary>
+            Gets links to the fields stored in subsystem data.
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.OpaqueLink.ClassName">
+            <summary>
+            Gets name of this object's class.
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.OpaqueLink.Item(System.String,System.Int32[])">
+            <inheritdoc />
+        </member>
+        <member name="P:MatFileHandler.OpaqueLink.Item(System.Int32[])">
+            <inheritdoc />
+        </member>
+        <member name="T:MatFileHandler.OpaqueLink.OpaqueObjectArrayElement">
+            <summary>
+            Provides access to a single object in object array.
+            </summary>
+        </member>
+        <member name="M:MatFileHandler.OpaqueLink.OpaqueObjectArrayElement.#ctor(MatFileHandler.OpaqueLink,System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:MatFileHandler.OpaqueLink.OpaqueObjectArrayElement"/> class.
+            </summary>
+            <param name="parent">Parent object array.</param>
+            <param name="index">Index of the object in the array.</param>
+        </member>
+        <member name="P:MatFileHandler.OpaqueLink.OpaqueObjectArrayElement.Count">
+            <inheritdoc />
+        </member>
+        <member name="P:MatFileHandler.OpaqueLink.OpaqueObjectArrayElement.Keys">
+            <inheritdoc />
+        </member>
+        <member name="P:MatFileHandler.OpaqueLink.OpaqueObjectArrayElement.Values">
+            <inheritdoc />
+        </member>
+        <member name="P:MatFileHandler.OpaqueLink.OpaqueObjectArrayElement.Item(System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:MatFileHandler.OpaqueLink.OpaqueObjectArrayElement.ContainsKey(System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:MatFileHandler.OpaqueLink.OpaqueObjectArrayElement.GetEnumerator">
+            <inheritdoc />
+        </member>
+        <member name="M:MatFileHandler.OpaqueLink.OpaqueObjectArrayElement.TryGetValue(System.String,MatFileHandler.IArray@)">
+            <inheritdoc />
+        </member>
+        <member name="M:MatFileHandler.OpaqueLink.OpaqueObjectArrayElement.System#Collections#IEnumerable#GetEnumerator">
+            <inheritdoc />
+        </member>
+        <member name="T:MatFileHandler.RawVariable">
+            <summary>
+            Raw variable read from the file.
+            This gives a way to deal with "subsystem data" which looks like
+            a variable and can only be detected by comparing its offset with
+            the value stored in the file's header.
+            </summary>
+        </member>
+        <member name="M:MatFileHandler.RawVariable.#ctor(System.Int64,MatFileHandler.DataElement)">
+            <summary>
+            Initializes a new instance of the <see cref="T:MatFileHandler.RawVariable"/> class.
+            </summary>
+            <param name="offset">Offset of the variable in the source file.</param>
+            <param name="dataElement">Data element parsed from the file.</param>
+        </member>
+        <member name="P:MatFileHandler.RawVariable.DataElement">
+            <summary>
+            Gets data element with the variable's contents.
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.RawVariable.Offset">
+            <summary>
+            Gets offset of the variable in the .mat file.
+            </summary>
+        </member>
+        <member name="T:MatFileHandler.StringAdapter">
+            <summary>
+            A better interface for using string objects.
+            </summary>
+        </member>
+        <member name="M:MatFileHandler.StringAdapter.#ctor(MatFileHandler.IArray)">
+            <summary>
+            Initializes a new instance of the <see cref="T:MatFileHandler.StringAdapter"/> class.
+            </summary>
+            <param name="array">Source string object.</param>
+        </member>
+        <member name="P:MatFileHandler.StringAdapter.Dimensions">
+            <summary>
+            Gets string array dimensions.
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.StringAdapter.Item(System.Int32[])">
+            <summary>
+            Gets string object at given position.
+            </summary>
+            <param name="list">Indices.</param>
+            <returns>Value.</returns>
+        </member>
+        <member name="T:MatFileHandler.SubsystemData">
+            <summary>
+            "Subsystem data" of the .mat file.
+            Subsystem data stores the actual contents
+            of all the "opaque objects" in the file.
+            </summary>
+        </member>
+        <member name="M:MatFileHandler.SubsystemData.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:MatFileHandler.SubsystemData"/> class.
+            Default constructor: initializes everything to null.
+            </summary>
+        </member>
+        <member name="M:MatFileHandler.SubsystemData.#ctor(System.Collections.Generic.Dictionary{System.Int32,MatFileHandler.SubsystemData.ClassInfo},System.Collections.Generic.Dictionary{System.Int32,MatFileHandler.SubsystemData.ObjectInfo},System.Collections.Generic.Dictionary{System.Int32,MatFileHandler.IArray})">
+            <summary>
+            Initializes a new instance of the <see cref="T:MatFileHandler.SubsystemData"/> class.
+            The actual constructor.
+            </summary>
+            <param name="classInformation">Information about the classes.</param>
+            <param name="objectInformation">Information about the objects.</param>
+            <param name="data">Field values.</param>
+        </member>
+        <member name="P:MatFileHandler.SubsystemData.ClassInformation">
+            <summary>
+            Gets information about all the classes occurring in the file.
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.SubsystemData.Data">
+            <summary>
+            Gets the actual data: mapping of "object field" indices to their values.
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.SubsystemData.ObjectInformation">
+            <summary>
+            Gets information about all the objects occurring in the file.
+            </summary>
+        </member>
+        <member name="M:MatFileHandler.SubsystemData.Set(MatFileHandler.SubsystemData)">
+            <summary>
+            Initialize this object from another object.
+            This ugly hack allows us to read the opaque objects and store references to
+            the subsystem data in them before parsing the actual subsystem data (which
+            comes later in the file).
+            </summary>
+            <param name="data">Another subsystem data.</param>
+        </member>
+        <member name="T:MatFileHandler.SubsystemData.ClassInfo">
+            <summary>
+            Stores information about a class.
+            </summary>
+        </member>
+        <member name="M:MatFileHandler.SubsystemData.ClassInfo.#ctor(System.String,System.Collections.Generic.Dictionary{System.String,System.Int32})">
+            <summary>
+            Initializes a new instance of the <see cref="T:MatFileHandler.SubsystemData.ClassInfo"/> class.
+            </summary>
+            <param name="name">Class name.</param>
+            <param name="fieldToIndex">A dictionary mapping field names to field ids.</param>
+        </member>
+        <member name="P:MatFileHandler.SubsystemData.ClassInfo.FieldNames">
+            <summary>
+            Gets names of the fields in the class.
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.SubsystemData.ClassInfo.Name">
+            <summary>
+            Gets name of the class.
+            </summary>
+        </member>
+        <member name="M:MatFileHandler.SubsystemData.ClassInfo.FindField(System.String)">
+            <summary>
+            Find a field index given its name.
+            </summary>
+            <param name="fieldName">Field name.</param>
+            <returns>Field index.</returns>
+        </member>
+        <member name="T:MatFileHandler.SubsystemData.ObjectInfo">
+            <summary>
+            Stores information about an object.
+            </summary>
+        </member>
+        <member name="M:MatFileHandler.SubsystemData.ObjectInfo.#ctor(System.Collections.Generic.Dictionary{System.Int32,System.Int32})">
+            <summary>
+            Initializes a new instance of the <see cref="T:MatFileHandler.SubsystemData.ObjectInfo"/> class.
+            </summary>
+            <param name="fieldLinks">A dictionary mapping the field indices to "field values" indices.</param>
+        </member>
+        <member name="P:MatFileHandler.SubsystemData.ObjectInfo.FieldLinks">
+            <summary>
+            Gets mapping between the field indices and "field values" indices.
+            </summary>
+        </member>
+        <member name="M:MatFileHandler.SubsystemData.RealSubsystemData.#ctor(System.Collections.Generic.Dictionary{System.Int32,MatFileHandler.SubsystemData.ClassInfo},System.Collections.Generic.Dictionary{System.Int32,MatFileHandler.SubsystemData.ObjectInfo},System.Collections.Generic.IReadOnlyDictionary{System.Int32,MatFileHandler.IArray})">
+            <summary>
+            Initializes a new instance of the <see cref="T:MatFileHandler.SubsystemData.RealSubsystemData"/> class.
+            </summary>
+            <param name="classInformation">Class information.</param>
+            <param name="objectInformation">Object information.</param>
+            <param name="data">Data.</param>
+        </member>
+        <member name="P:MatFileHandler.SubsystemData.RealSubsystemData.ClassInformation">
+            <summary>
+            Gets information about all the classes occurring in the file.
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.SubsystemData.RealSubsystemData.Data">
+            <summary>
+            Gets the actual data: mapping of "object field" indices to their values.
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.SubsystemData.RealSubsystemData.ObjectInformation">
+            <summary>
+            Gets information about all the objects occurring in the file.
+            </summary>
+        </member>
+        <member name="T:MatFileHandler.SubsystemDataReader">
+            <summary>
+            Reader for "subsystem data" in .mat files.
+            </summary>
+        </member>
+        <member name="M:MatFileHandler.SubsystemDataReader.Read(System.Byte[],MatFileHandler.SubsystemData)">
+            <summary>
+            Read subsystem data from a given byte array.
+            </summary>
+            <param name="bytes">Byte array with the data.</param>
+            <param name="subsystemData">
+            Link to the existing subsystem data; this will be put in nested OpaqueLink objects
+            and later replaced with the subsystem data that we are currently reading.</param>
+            <returns>Subsystem data read.</returns>
+        </member>
+        <member name="T:MatFileHandler.TableAdapter">
+            <summary>
+            A better interface for using table objects.
+            </summary>
+        </member>
+        <member name="M:MatFileHandler.TableAdapter.#ctor(MatFileHandler.IArray)">
+            <summary>
+            Initializes a new instance of the <see cref="T:MatFileHandler.TableAdapter"/> class.
+            </summary>
+            <param name="array">Source table object.</param>
+        </member>
+        <member name="P:MatFileHandler.TableAdapter.Description">
+            <summary>
+            Gets table description.
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.TableAdapter.NumberOfRows">
+            <summary>
+            Gets the number of rows in the table.
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.TableAdapter.NumberOfVariables">
+            <summary>
+            Gets the number of variables in the table.
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.TableAdapter.RowNames">
+            <summary>
+            Gets row names.
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.TableAdapter.VariableNames">
+            <summary>
+            Gets variable names.
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.TableAdapter.Item(System.String)">
+            <summary>
+            Gets all the data for a given variable.
+            </summary>
+            <param name="variableName">Variable name.</param>
+            <returns>All data associated with the variable.</returns>
+        </member>
+        <member name="T:MatFileHandler.DataType">
+            <summary>
+            Type of the data attached to the tag.
+            </summary>
+        </member>
+        <member name="F:MatFileHandler.DataType.MiInt8">
+            <summary>
+            An array of Int8 elements.
+            </summary>
+        </member>
+        <member name="F:MatFileHandler.DataType.MiUInt8">
+            <summary>
+            An array of UInt8 elements.
+            </summary>
+        </member>
+        <member name="F:MatFileHandler.DataType.MiInt16">
+            <summary>
+            An array of Int16 elements.
+            </summary>
+        </member>
+        <member name="F:MatFileHandler.DataType.MiUInt16">
+            <summary>
+            An array of UInt16 elements.
+            </summary>
+        </member>
+        <member name="F:MatFileHandler.DataType.MiInt32">
+            <summary>
+            An array of Int32 elements.
+            </summary>
+        </member>
+        <member name="F:MatFileHandler.DataType.MiUInt32">
+            <summary>
+            An array of UInt32 elements.
+            </summary>
+        </member>
+        <member name="F:MatFileHandler.DataType.MiSingle">
+            <summary>
+            An array of Single elements.
+            </summary>
+        </member>
+        <member name="F:MatFileHandler.DataType.MiDouble">
+            <summary>
+            An array of Double elements.
+            </summary>
+        </member>
+        <member name="F:MatFileHandler.DataType.MiInt64">
+            <summary>
+            An array of Int64 elements.
+            </summary>
+        </member>
+        <member name="F:MatFileHandler.DataType.MiUInt64">
+            <summary>
+            An array of UInt64 elements.
+            </summary>
+        </member>
+        <member name="F:MatFileHandler.DataType.MiMatrix">
+            <summary>
+            A matrix.
+            </summary>
+        </member>
+        <member name="F:MatFileHandler.DataType.MiCompressed">
+            <summary>
+            A compressed data element.
+            </summary>
+        </member>
+        <member name="F:MatFileHandler.DataType.MiUtf8">
+            <summary>
+            An array of UTF-8 elements.
+            </summary>
+        </member>
+        <member name="F:MatFileHandler.DataType.MiUtf16">
+            <summary>
+            An array of UTF-16 elements.
+            </summary>
+        </member>
+        <member name="F:MatFileHandler.DataType.MiUtf32">
+            <summary>
+            An array of UTF-32 elements.
+            </summary>
+        </member>
+        <member name="T:MatFileHandler.Tag">
+            <summary>
+            Data element tag.
+            </summary>
+        </member>
+        <member name="M:MatFileHandler.Tag.#ctor(MatFileHandler.DataType,System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:MatFileHandler.Tag"/> class.
+            </summary>
+            <param name="type">Data type.</param>
+            <param name="length">Data length (number of elements).</param>
+        </member>
+        <member name="P:MatFileHandler.Tag.Type">
+            <summary>
+            Gets the type of the attached data.
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.Tag.Length">
+            <summary>
+            Gets data length (number of elements).
+            </summary>
+        </member>
+        <member name="P:MatFileHandler.Tag.ElementSize">
+            <summary>
+            Gets size of a data element in bytes.
+            </summary>
+        </member>
+    </members>
+</doc>

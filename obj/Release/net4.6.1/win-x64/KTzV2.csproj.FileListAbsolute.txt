@@ -1,0 +1,13 @@
+D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\bin\x64\Release\net4.6.1\win-x64\KTzV2.exe.config
+D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\bin\x64\Release\net4.6.1\win-x64\KTzV2.exe
+D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\bin\x64\Release\net4.6.1\win-x64\KTzV2.pdb
+D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\bin\x64\Release\net4.6.1\win-x64\MatFileHandler.dll
+D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\bin\x64\Release\net4.6.1\win-x64\System.ValueTuple.dll
+D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\obj\Release\net4.6.1\win-x64\KTzV2.csproj.AssemblyReference.cache
+D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\obj\Release\net4.6.1\win-x64\KTzV2.GeneratedMSBuildEditorConfig.editorconfig
+D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\obj\Release\net4.6.1\win-x64\KTzV2.AssemblyInfoInputs.cache
+D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\obj\Release\net4.6.1\win-x64\KTzV2.AssemblyInfo.cs
+D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\obj\Release\net4.6.1\win-x64\KTzV2.csproj.CoreCompileInputs.cache
+D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\obj\Release\net4.6.1\win-x64\KTzV2.csproj.Up2Date
+D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\obj\Release\net4.6.1\win-x64\KTzV2.exe
+D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\obj\Release\net4.6.1\win-x64\KTzV2.pdb

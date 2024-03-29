@@ -1,0 +1,109 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+<!--
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+-->
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <ImplicitUsings>disable</ImplicitUsings>      <!--<ImplicitUsings>enable</ImplicitUsings>-->
+    <Nullable>disable</Nullable>                  <!--<Nullable>enable</Nullable>-->
+    <StartupObject>KTzV2.Program</StartupObject>
+    <!--
+      ######### if this is false, I have to uncomment the ItemGroup with the .cs files
+      <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+      -->
+    <!--
+    <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
+    -->
+  </PropertyGroup>
+
+  <!--
+  <PropertyGroup Condition="$(Configuration.Contains(Debug))">
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  -->
+  
+    <PropertyGroup Condition="$(Configuration.Contains(Debug))">
+    <!--################# working-->
+    <TargetFramework>net8.0</TargetFramework>
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>portable</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <!--
+    ################# this line doesn't crash debugger
+    <ErrorReport>prompt</ErrorReport>
+    ################# the following options stop debugger from working
+    <DebugType>full</DebugType>
+    <Prefer32Bit>false</Prefer32Bit>
+    <PlatformTarget>x64</PlatformTarget>
+    #################
+    -->
+  </PropertyGroup>
+
+  <PropertyGroup Condition="$(Configuration.Contains(Release))">
+    <!--<TargetFramework>net4.6.1</TargetFramework>-->
+    <TargetFramework>net8.0</TargetFramework>
+    <DebugSymbols>false</DebugSymbols>
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MatFileHandler" Version="1.3.0" />
+  </ItemGroup>
+  <!--
+    ##################### THIS WAS COPIED FROM THE ORIGINAL csproj file
+    ##################### WITH SOME GUIDANCE FROM 
+    <ItemGroup>
+    <Reference Include="MatFileHandler, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\MatFileHandler.1.3.0\lib\net461\MatFileHandler.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.ValueTuple.4.4.0\lib\net461\System.ValueTuple.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="KTzV2_Maths_Calculus.cs" />
+    <Compile Include="KTzV2_Sims_Network.cs" />
+    <Compile Include="KTzV2_Data_Header.cs" />
+    <Compile Include="KTzV2_Data.cs" />
+    <Compile Include="KTzV2_Maths_AdjacencyMatrix.cs" />
+    <Compile Include="KTzV2_Maths_Matrices.cs" />
+    <Compile Include="KTzV2_Maths_Random.cs" />
+    <Compile Include="KTzV2_Neurons.cs" />
+    <Compile Include="KTzV2_Stimuli.cs" />
+    <Compile Include="KTzV2_Synapses.cs" />
+    <Compile Include="MT19937.cs" />
+    <Compile Include="Program.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+-->
+
+</Project>

@@ -1,0 +1,71 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            // Use IntelliSense to find out which attributes exist for C# debugging
+            // Use hover for the description of the existing attributes
+            // For further information visit https://github.com/dotnet/vscode-csharp/blob/main/debugger-launchjson.md
+            "name": ".NET Debug",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build debug",
+            // If you have changed target frameworks, make sure to update the program path.
+            //"program": "${workspaceFolder}/bin/Debug/net8.0/KTzV2.dll",
+            "program": "${workspaceFolder}/bin/x64/Debug/net8.0/KTzV2.dll",
+            //"program": "${workspaceFolder}/bin/Debug/KTzV2.exe", //
+            "args": ["-run",
+            "netType=SquareLatticeFreeBC",
+            "Lx=20",
+            "Ly=20",
+            "netDir=No",
+            "dim=2",
+            "K=0.6",
+            "T=0.35",
+            "d=0.001",
+            "l=0.008",
+            "xR=-0.7",
+            "H=0",
+            "neuron=KTz",
+            "x0=1",
+            "y0=1",
+            "z0=1",
+            "iCond=ProgramSpecified",
+            "sType=KTNoisyChemicalSynapse",
+            "tauf=2",
+            "taug=2",
+            "R=0.036",
+            "coupParam=Homogeneous",
+            "stimType=PoissonProcess",
+            "indChoice=Random",
+            "sampFrac=1",
+            "nStart=0",
+            "nSteps=10000",
+            "cVar=NumberOfSpikes",
+            "samp=Full",
+            "simType=Dynamics",
+            "oFileFormat=mat",
+            "outAvgMode=OverTime",
+            "wData=Yes",
+            "wCSV=No",
+            "wSpk=No",
+            "wObs=No",
+            "nSim=1",
+            "bifWrite=OnTheEnd",
+            "writeRhoTS=Yes",
+            "dynType=ContinuousTime",
+            "J=-0.2",
+            "nJ=1",
+            "r=1"],
+            "cwd": "${workspaceFolder}",
+            // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
+            "console": "internalConsole",
+            "stopAtEntry": false,
+            "justMyCode": false
+        },
+        {
+            "name": ".NET Core Attach",
+            "type": "coreclr",
+            "request": "attach"
+        }
+    ]
+}

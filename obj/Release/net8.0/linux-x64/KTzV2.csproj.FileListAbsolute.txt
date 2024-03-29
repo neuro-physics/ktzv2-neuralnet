@@ -1,0 +1,17 @@
+D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\bin\x64\Release\net8.0\linux-x64\KTzV2
+D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\bin\x64\Release\net8.0\linux-x64\KTzV2.deps.json
+D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\bin\x64\Release\net8.0\linux-x64\KTzV2.runtimeconfig.json
+D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\bin\x64\Release\net8.0\linux-x64\KTzV2.dll
+D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\bin\x64\Release\net8.0\linux-x64\KTzV2.pdb
+D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\bin\x64\Release\net8.0\linux-x64\MatFileHandler.dll
+D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\obj\Release\net8.0\linux-x64\KTzV2.csproj.AssemblyReference.cache
+D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\obj\Release\net8.0\linux-x64\KTzV2.GeneratedMSBuildEditorConfig.editorconfig
+D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\obj\Release\net8.0\linux-x64\KTzV2.AssemblyInfoInputs.cache
+D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\obj\Release\net8.0\linux-x64\KTzV2.AssemblyInfo.cs
+D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\obj\Release\net8.0\linux-x64\KTzV2.csproj.CoreCompileInputs.cache
+D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\obj\Release\net8.0\linux-x64\KTzV2.csproj.Up2Date
+D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\obj\Release\net8.0\linux-x64\KTzV2.dll
+D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\obj\Release\net8.0\linux-x64\refint\KTzV2.dll
+D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\obj\Release\net8.0\linux-x64\KTzV2.pdb
+D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\obj\Release\net8.0\linux-x64\KTzV2.genruntimeconfig.cache
+D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\obj\Release\net8.0\linux-x64\ref\KTzV2.dll

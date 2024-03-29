@@ -1,0 +1,13 @@
+D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\bin\Debug\net4.6.1\KTzV2.exe.config
+D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\bin\Debug\net4.6.1\KTzV2.exe
+D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\bin\Debug\net4.6.1\KTzV2.pdb
+D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\bin\Debug\net4.6.1\MatFileHandler.dll
+D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\bin\Debug\net4.6.1\System.ValueTuple.dll
+D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\obj\Debug\net4.6.1\KTzV2.csproj.AssemblyReference.cache
+D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\obj\Debug\net4.6.1\KTzV2.GeneratedMSBuildEditorConfig.editorconfig
+D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\obj\Debug\net4.6.1\KTzV2.AssemblyInfoInputs.cache
+D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\obj\Debug\net4.6.1\KTzV2.AssemblyInfo.cs
+D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\obj\Debug\net4.6.1\KTzV2.csproj.CoreCompileInputs.cache
+D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\obj\Debug\net4.6.1\KTzV2.csproj.Up2Date
+D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\obj\Debug\net4.6.1\KTzV2.exe
+D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\obj\Debug\net4.6.1\KTzV2.pdb
