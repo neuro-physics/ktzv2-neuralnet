@@ -185,7 +185,7 @@ namespace KTzV2.Maths.Matrices.AdjacencyMatrix
         {
             this.L = L;
             this.isPeriodic = isPeriodic;
-            this.RunProcess();
+            this.RunBuildNetProcess();
             base.Initialize(this.FileName);
         }
 
@@ -237,7 +237,7 @@ namespace KTzV2.Maths.Matrices.AdjacencyMatrix
         {
             // setting parameters
             this.NElems = numOfElems;
-            this.RunProcess();
+            this.RunBuildNetProcess();
             base.Initialize(this.FileName);
         }
     }
@@ -261,7 +261,7 @@ namespace KTzV2.Maths.Matrices.AdjacencyMatrix
             this.NElems = numOfElems;
             this.k = numOfNeighbours;
             this.p = rewiringProb;
-            this.RunProcess();
+            this.RunBuildNetProcess();
             base.Initialize(this.FileName);
         }
 
@@ -294,7 +294,7 @@ namespace KTzV2.Maths.Matrices.AdjacencyMatrix
             this.NElems = numOfElems;
             this.k = numOfNeighbours;
             this.p = rewiringProb;
-            this.RunProcess();
+            this.RunBuildNetProcess();
             base.Initialize(this.FileName);
         }
 
@@ -326,7 +326,7 @@ namespace KTzV2.Maths.Matrices.AdjacencyMatrix
             // setting parameters
             this.NElems = numOfElems;
             this.p = pOfEdgeCreation;
-            this.RunProcess();
+            this.RunBuildNetProcess();
             base.Initialize(this.FileName);
         }
 
@@ -358,7 +358,7 @@ namespace KTzV2.Maths.Matrices.AdjacencyMatrix
             // setting parameters
             this.NElems = numOfElems;
             this.m = numOfEdgesForNewElem;
-            this.RunProcess();
+            this.RunBuildNetProcess();
             base.Initialize(this.FileName);
         }
 
@@ -400,10 +400,9 @@ namespace KTzV2.Maths.Matrices.AdjacencyMatrix
         /// generates a process start info for this graph
         /// </summary>
         /// <returns></returns>
-        protected System.Diagnostics.ProcessStartInfo GetProcessStartInfo()
+        protected System.Diagnostics.ProcessStartInfo GetProcessStartInfo(String pythonArgs)
         {
             // creating a process startinfo
-            String pythonArgs = String.Format("-c \"import networkx as nx; import numpy as np; {0}; np.savetxt('{1}',{2},fmt='%1d')\"", this.GetNetworkXGeneratorMethodCall(), this.FileName, this.GetNetworkXAdjMatrix());
             this.ProcessInfo = new System.Diagnostics.ProcessStartInfo();
             this.ProcessInfo.RedirectStandardOutput = true;
             this.ProcessInfo.RedirectStandardError = true;
@@ -446,11 +445,12 @@ namespace KTzV2.Maths.Matrices.AdjacencyMatrix
         /// <summary>
         /// runs the process with the networkx
         /// </summary>
-        protected void RunProcess()
+        protected void RunBuildNetProcess()
         {
             // creating process
             System.Diagnostics.Process proc = new System.Diagnostics.Process();
-            proc.StartInfo = this.GetProcessStartInfo();
+            String pythonArgs = String.Format("-c \"import networkx as nx; import numpy as np; {0}; np.savetxt('{1}',{2},fmt='%1d')\"", this.GetNetworkXGeneratorMethodCall(), this.FileName, this.GetNetworkXAdjMatrix());
+            proc.StartInfo = this.GetProcessStartInfo(pythonArgs);
             try
             {
                 proc.Start();
@@ -473,7 +473,7 @@ namespace KTzV2.Maths.Matrices.AdjacencyMatrix
         public override SparseMatrix<Double> BuildAndGetMatrix()
         {
             if (!System.IO.File.Exists(this.FileName))
-                this.RunProcess();
+                this.RunBuildNetProcess();
             SparseMatrix<Double> adj = base.BuildAndGetMatrix();
             if (System.IO.File.Exists(this.FileName))
                 System.IO.File.Delete(this.FileName);
