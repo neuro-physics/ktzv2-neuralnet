@@ -387,6 +387,9 @@ namespace KTzV2.Data.Header
                 case KTzParameters.oFileFormat:
                     val = Enum.Parse(typeof(KTzV2.Data.Header.OutputFileFormat), value, true);
                     break;
+                case KTzParameters.ParamForRange:
+                    val = Enum.Parse(typeof(KTzV2.ParamForRangeInDynamicsSim), value, true);
+                    break;
                 case KTzParameters.avgInp:
                 case KTzParameters.wCSV:
                 case KTzParameters.wData:
@@ -996,6 +999,9 @@ namespace KTzV2.Data.Header
 
             KTzHeader.ParamDescription.Add(KTzParameters.alphaRange, "range values for alpha parameter when running Bifurcation simulation; if set ignores minalpha, maxalpha, nalpha (comma separated list of: min:max:dx OR range(min:max:dx) OR linspace(min:max:nx) OR logspace(min:max:nx))");
             KTzHeader.AddPar(KTzParameters.alphaRange, "", KTzParamGroups.Synapse);
+            
+            KTzHeader.ParamDescription.Add(KTzParameters.ParamForRange, "parameter used to create a range for simulation of the type DynamicsWithinParamRange" + Environment.NewLine + KTzHeader.GetEnumListStr<KTzV2.ParamForRangeInDynamicsSim>());
+            KTzHeader.AddPar(KTzParameters.ParamForRange, (Int32)KTzV2.ParamForRangeInDynamicsSim.J, KTzParamGroups.Simulation, typeof(KTzV2.ParamForRangeInDynamicsSim));
 
             KTzHeader.ParamDescription.Add(KTzParameters.bifWrite, "OnTheFly == writes data after each pair (I,J); OnTheEnd == writes after everything is finished" + Environment.NewLine + KTzHeader.GetEnumListStr<KTzV2.BifurcationWritePolicy>());
             KTzHeader.AddPar(KTzParameters.bifWrite, (Int32)KTzV2.BifurcationWritePolicy.OnTheEnd, KTzParamGroups.Simulation, typeof(KTzV2.BifurcationWritePolicy));
@@ -1951,6 +1957,10 @@ namespace KTzV2.Data.Header
         /// <summary>
         /// disorder for Theta
         /// </summary>
-        ThetaDisorder
+        ThetaDisorder,
+        /// <summary>
+        /// parameter used to simulate a range in DynamicsWithinParamRange simulation
+        /// </summary>
+        ParamForRange
     }
 }

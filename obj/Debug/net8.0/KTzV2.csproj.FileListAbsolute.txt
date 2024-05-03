@@ -21,3 +21,4 @@ D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\bin\x64\Debug\net8.0\KTzV2.runtimeco
 D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\bin\x64\Debug\net8.0\KTzV2.dll
 D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\bin\x64\Debug\net8.0\KTzV2.pdb
 D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\bin\x64\Debug\net8.0\MatFileHandler.dll
+D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\obj\Debug\net8.0\KTzV2.sourcelink.json

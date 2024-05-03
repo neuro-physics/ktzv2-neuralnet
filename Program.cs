@@ -12,8 +12,14 @@ namespace KTzV2
     public enum SimulationType
     {
         Dynamics,
+        DynamicsWithinParamRange,
         Bifurcation,
         KTzPhaseDiagram
+    }
+
+    public enum ParamForRangeInDynamicsSim
+    {
+        J, I, alpha, r, Theta
     }
 
     public enum DynamicsSimType
@@ -168,21 +174,35 @@ namespace KTzV2
                 System.Diagnostics.Stopwatch chronometer = new System.Diagnostics.Stopwatch();
                 chronometer.Start();
 
-                if ((SimulationType)KTzHeader.GetPar_Int32(KTzParameters.simType) == SimulationType.Dynamics)
+                if (((SimulationType)KTzHeader.GetPar_Int32(KTzParameters.simType) == SimulationType.Dynamics) || ((SimulationType)KTzHeader.GetPar_Int32(KTzParameters.simType) == SimulationType.DynamicsWithinParamRange) )
                 {
                     KTzNetworkSimulator KTzProg = new KTzNetworkSimulator(false);
 
-                    KTzParameters par = KTzParameters.J;
-                    Double[] parRange = KTzHeader.GetRangeFor(par);
-                    String parName = "J";
+                    var parForRange = (ParamForRangeInDynamicsSim)KTzHeader.GetPar_Int32(KTzParameters.ParamForRange);
+                    bool hasRangeParam = Enum.TryParse(parForRange.ToString() + "Range", false, out KTzParameters _par);
+                    if (!hasRangeParam)
+                        throw new ArgumentException("Attempted to create a Range for a parameter that has no Range input: " + parForRange.ToString());
+
+
+                    //KTzParameters par = KTzParameters.J;
+                    Enum.TryParse(parForRange.ToString(), false, out KTzParameters par);
+                    String parName = parForRange.ToString();
+                    Double[] parRange;
+
+                    if ((SimulationType)KTzHeader.GetPar_Int32(KTzParameters.simType) == SimulationType.DynamicsWithinParamRange)
+                        parRange = KTzHeader.GetRangeFor(par);
+                    else
+                        parRange = new double[] { KTzHeader.GetPar_Double(par) };
+
 
                     KTzV2.Neurons.NeuronType nt = (KTzV2.Neurons.NeuronType)KTzHeader.GetPar_Int32(KTzParameters.neuron);
-                    if (nt == KTzV2.Neurons.NeuronType.SIElement)
-                    {
-                        par = KTzParameters.Theta;
-                        parRange = KTzHeader.GetRangeFor(KTzParameters.Theta);
-                        parName = "Theta";
-                    }
+                    if ((nt == KTzV2.Neurons.NeuronType.SIElement) && (parForRange != ParamForRangeInDynamicsSim.Theta))
+                        Console.WriteLine("WARNING: SIElement is the neuron, but ParamForRange is not Theta");
+                    //{
+                        //par = KTzParameters.Theta;
+                        //parRange = KTzHeader.GetRangeFor(KTzParameters.Theta);
+                        //parName = "Theta";
+                    //}
 
                     if (parRange.Length > 1)
                     {
