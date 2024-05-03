@@ -212,7 +212,7 @@ namespace KTzV2.Maths.Matrices.AdjacencyMatrix
         /// <returns>the python command line to get the adjacency matrix of the selected method from networkx</returns>
         protected override string GetNetworkXAdjMatrix()
         {
-            return "nx.adj_matrix(G,nodelist=sorted(G.nodes()))";
+            return "nx.adjacency_matrix(G,nodelist=sorted(G.nodes())).todense()";
         }
 
         /// <summary>
@@ -439,7 +439,7 @@ namespace KTzV2.Maths.Matrices.AdjacencyMatrix
         /// <returns>the python command line to get the adjacency matrix of the selected method from networkx</returns>
         protected virtual String GetNetworkXAdjMatrix()
         {
-            return "nx.adj_matrix(G)";
+            return "nx.adjacency_matrix(G).todense()";
         }
 
         /// <summary>
