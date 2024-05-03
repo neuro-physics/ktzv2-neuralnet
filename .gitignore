@@ -1,4 +1,4 @@
 #!bin/
-!bin/x64/Release/net8.0/win-x64/publish
-!bin/x64/Release/net8.0/linux-x64/publish
-bin/*
+#!bin/x64/Release/net8.0/win-x64/publish
+#!bin/x64/Release/net8.0/linux-x64/publish
+#bin/*
