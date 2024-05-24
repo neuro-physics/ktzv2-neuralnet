@@ -1,5 +1,0 @@
-D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\bin\x64\Release\net4.6.1\win-x64\publish\KTzV2.exe
-D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\bin\x64\Release\net4.6.1\win-x64\publish\KTzV2.exe.config
-D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\bin\x64\Release\net4.6.1\win-x64\publish\KTzV2.pdb
-D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\bin\x64\Release\net4.6.1\win-x64\publish\MatFileHandler.dll
-D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\bin\x64\Release\net4.6.1\win-x64\publish\System.ValueTuple.dll

@@ -1,6 +1,0 @@
-D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\bin\x64\Release\net8.0\linux-x64\publish\KTzV2
-D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\bin\x64\Release\net8.0\linux-x64\publish\KTzV2.dll
-D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\bin\x64\Release\net8.0\linux-x64\publish\KTzV2.deps.json
-D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\bin\x64\Release\net8.0\linux-x64\publish\KTzV2.runtimeconfig.json
-D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\bin\x64\Release\net8.0\linux-x64\publish\KTzV2.pdb
-D:\Dropbox\p\ufsc\pesquisa\simulacoes\KTzV2\bin\x64\Release\net8.0\linux-x64\publish\MatFileHandler.dll
