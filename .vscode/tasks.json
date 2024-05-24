@@ -26,7 +26,7 @@
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary;ForceNoAlign",
                 "--arch:x64",
-                "--no-self-contained",//"--self-contained:true",
+                "--no-self-contained",
                 "--configuration",
                 "Release"
             ],
@@ -43,11 +43,29 @@
                 "/consoleloggerparameters:NoSummary;ForceNoAlign",
                 "--arch:x64",
                 "--os:linux",
-                "--no-self-contained",//"--self-contained:true",
+                "--no-self-contained",
                 "--configuration",
                 "Release"
             ],
             "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "build and move exec win",
+            "dependsOn": [
+                "build release win"
+            ],
+            "type": "shell",
+            "command": "mv ${workspaceFolder}/bin/x64/Release/net8.0/win-x64/publish/* ${workspaceFolder}/simulations/win -Force",
+            "problemMatcher": []
+        },
+        {
+            "label": "build and move exec linux",
+            "dependsOn": [
+                "build release linux"
+            ],
+            "type": "shell",
+            "command": "mv -f ${workspaceFolder}/bin/x64/Release/net8.0/linux-x64/publish/* ${workspaceFolder}/simulations/linux",
+            "problemMatcher": []
         },
         {
             "label": "watch",

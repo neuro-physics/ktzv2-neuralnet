@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("KTzV2")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f48a6aba8f4b59d4a70587e4be8c5757673665c4")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9d11d4c8a898b6c6b1a53aa5b567bb0affe7e1dd")]
 [assembly: System.Reflection.AssemblyProductAttribute("KTzV2")]
 [assembly: System.Reflection.AssemblyTitleAttribute("KTzV2")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

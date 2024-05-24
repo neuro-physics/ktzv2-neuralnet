@@ -371,12 +371,18 @@ namespace KTzV2.Neurons
         protected KTzV2.Maths.Random.HomogeneousRand rand { get; private set; }
 
         /// <summary>
-        /// KTNeuron constructor
+        /// creates a stochastic neuron of the Galves-Locherbach type
         /// </summary>
-        /// <param name="K">K parameter</param>
-        /// <param name="T">T parameter</param>
-        /// <param name="x_init">x (membrane potential) initial value</param>
-        /// <param name="y_init">y (recurrent variable) initial value</param>
+        /// <param name="ind">index of this neuron in the network</param>
+        /// <param name="VR">reset membrane potential</param>
+        /// <param name="VT">threshold</param>
+        /// <param name="VB">baseline potential</param>
+        /// <param name="mu">dissipation constant</param>
+        /// <param name="x_init">spike variable Init condition</param>
+        /// <param name="V_init">membrane potential initial condition</param>
+        /// <param name="Gamma_init">initial value for gain constant</param>
+        /// <param name="normalizeInput">chooses to normalize input</param>
+        /// <param name="seed">seed for random number generator</param>
         protected StochasticGLElement(Int32 ind, Double VR, Double VT, Double VB, Double mu, Double x_init, Double V_init, Double Gamma_init, Boolean normalizeInput = false, UInt64? seed = null)
         {
             this.Index = ind;
@@ -478,6 +484,11 @@ namespace KTzV2.Neurons
         public virtual void ResetIC(Double[] ic)
         {
             this.x = ic[0];
+        }
+
+        public virtual bool SpikeDetector()
+        {
+            return this.x == 1.0;
         }
     }
 
@@ -1179,6 +1190,17 @@ namespace KTzV2.Neurons
             this.x = ic[0];
             this.y = ic[1];
         }
+
+        /// <summary>
+        /// checks if this neuron is emitting a spike in its current time step iteration and returns true if it is
+        /// 
+        /// here, a spike is detected whenever the membrane potential crosses x=0 from a negative toa positive value
+        /// </summary>
+        /// <returns>returns true if the neuron is currently spiking, false otherwise</returns>
+        public virtual bool SpikeDetector()
+        {
+            return (this.x * this.x_prev < 0.0) && (this.x_prev < this.x);
+        }
     }
 
     public class SIElement : ThresholdElement
@@ -1247,12 +1269,11 @@ namespace KTzV2.Neurons
         public Double x { get; protected set; }
 
         /// <summary>
-        /// KTNeuron constructor
+        /// ThresholdElement constructor
         /// </summary>
-        /// <param name="K">K parameter</param>
-        /// <param name="T">T parameter</param>
+        /// <param name="ind">this neuron index in the network</param>
+        /// <param name="Theta">Threshold of this neuron</param>
         /// <param name="x_init">x (membrane potential) initial value</param>
-        /// <param name="y_init">y (recurrent variable) initial value</param>
         protected ThresholdElement(Int32 ind, Double Theta, Double x_init)
         {
             this.Index = ind;
@@ -1335,6 +1356,15 @@ namespace KTzV2.Neurons
         {
             this.x = ic[0];
         }
+
+        /// <summary>
+        /// checks if this neuron is emitting a spike in its current time step iteration and returns true if it is
+        /// </summary>
+        /// <returns>returns true if the neuron is currently spiking, false otherwise</returns>
+        public virtual bool SpikeDetector()
+        {
+            return this.x == 1.0;
+        }
     }
 
     /// <summary>
@@ -1390,5 +1420,11 @@ namespace KTzV2.Neurons
         /// </summary>
         /// <param name="ic">new values for neurons variables</param>
         void ResetIC(Double[] ic);
+
+        /// <summary>
+        /// checks if this neuron is emitting a spike in its current time step iteration and returns true if it is
+        /// </summary>
+        /// <returns>returns true if the neuron is currently spiking, false otherwise</returns>
+        bool SpikeDetector();
     }
 }

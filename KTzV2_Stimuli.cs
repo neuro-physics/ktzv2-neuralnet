@@ -213,7 +213,7 @@ namespace KTzV2.Stimuli
         /// <param name="signalStdDev">the std deviation of the generated signal</param>
         public PoissonProcess(Double r, Double signalMean, Double signalStdDev)
         {
-            this.r = 1.0D - Math.Exp(-r); // this is the probability of firing, and it is constant
+            this.r = 1.0D - Math.Exp(-1.0D/r); // this is the probability of firing, and it is constant
             this.rand = new HomogeneousRand();
             this.signalIntensity = new GaussianRand(signalMean, signalStdDev);
         }
