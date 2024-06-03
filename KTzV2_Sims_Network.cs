@@ -24,6 +24,16 @@ namespace KTzV2.Sims.Network
         MostConnected
     }
 
+    public enum SimulationTimeScheme
+    {
+        // total simulation time (nSteps - nStartStep; discounting transient)
+        // is proportional to 10/(r*N)
+        // r->Poisson rate, N->number of neurons in the network
+        ProportionalToPoissonRate,
+        // total simulation time is whatever is set by the user
+        Free
+    }
+
     public enum CouplingParam
     {
         Homogeneous, // same J for every synapse
@@ -144,17 +154,47 @@ namespace KTzV2.Sims.Network
             //{
             //    linearSize = nNeurons;
             //}
-            IAdjacencyMatrix<Double> boolMatrixGetter = FGetAdjacencyMatrix.GetMatrixFor(this.networkType, this.nNeurons, new Int32[] { this.Lx, this.Ly, this.Lz }, this.nNeighbours, this.numOfConnBAGraph, this.rewireProbWSGraph, Convert.ToBoolean(KTzHeader.GetPar_Int32(KTzParameters.netDir)), KTzHeader.GetPar_String(KTzParameters.netFile));
+            IAdjacencyMatrix<Double> boolMatrixGetter = FGetAdjacencyMatrix.GetMatrixFor(this.networkType, 
+                                                                                         this.nNeurons,
+                                                                                         new Int32[] { this.Lx, this.Ly, this.Lz },
+                                                                                         this.nNeighbours,
+                                                                                         this.numOfConnBAGraph,
+                                                                                         this.rewireProbWSGraph,
+                                                                                         Convert.ToBoolean(KTzHeader.GetPar_Int32(KTzParameters.netDir)), 
+                                                                                         KTzHeader.GetPar_String(KTzParameters.netFile)
+                                                                                         );
             AMatrix = boolMatrixGetter.BuildAndGetMatrix();
             if (this.networkType == AdjacencyMatrixType.FromFile)
             {
-                this.nNeurons = AMatrix.nCol;
+                if (this.AMatrix == null)
+                    throw new ArgumentNullException("Could not load and/or create adjacency matrix FromFile");
+                else
+                {
+                    this.nNeurons = this.AMatrix.nRow;
+                    this.Lx       = this.nNeurons;
+                    this.Ly       = 1;
+                    this.Lz       = 1;
+                    KTzHeader.SetPar(KTzParameters.Lx, this.Lx);
+                    KTzHeader.SetPar(KTzParameters.Ly, this.Ly);
+                    KTzHeader.SetPar(KTzParameters.Lz, this.Lz);
+                }
             }
             this.GetSampParAndSetSamplingIndices();
         }
 
         private void getSetOfParameters()
         {
+            this.networkType       = (AdjacencyMatrixType)KTzHeader.GetPar_Int32(KTzParameters.netType);
+            this.synapseType       = (SynapseType)KTzHeader.GetPar_Int32(KTzParameters.sType);
+            this.neuronType        = (NeuronType)KTzHeader.GetPar_Int32(KTzParameters.neuron);
+            this.icType            = (InitialConditionType)KTzHeader.GetPar_Int32(KTzParameters.iCond);
+            this.countVar          = (KTzV2.Data.CountVariable)KTzHeader.GetPar_Int32(KTzParameters.cVar);
+            this.stimulusType      = (StimulusType)KTzHeader.GetPar_Int32(KTzParameters.stimType);
+            this.noiseType         = (KTzV2.Synapses.NoiseType)KTzHeader.GetPar_Int32(KTzParameters.noiseType);
+            this.couplingParamType = (CouplingParam)KTzHeader.GetPar_Int32(KTzParameters.coupParam);
+            this.indChoice         = (StimulusIndexChoice)KTzHeader.GetPar_Int32(KTzParameters.indChoice);
+            this.saveSpikeTimes    = KTzHeader.GetPar_Int32(KTzParameters.saveSpikeTimes) == 1;
+
             /***
              **
              **
@@ -162,26 +202,10 @@ namespace KTzV2.Sims.Network
              **
              **
              ***/
-            if (this.networkType == AdjacencyMatrixType.FromFile)
-            {
-                if (this.AMatrix != null)
-                {
-                    this.nNeurons = this.AMatrix.nRow;
-                    this.Lx       = this.nNeurons;
-                    this.Ly       = 1;
-                    this.Lz       = 1;
-                }
-                KTzHeader.SetPar(KTzParameters.Lx, this.Lx);
-                KTzHeader.SetPar(KTzParameters.Ly, this.Ly);
-                KTzHeader.SetPar(KTzParameters.Lz, this.Lz);
-            }
-            else
-            {
-                this.Lx       = KTzHeader.GetPar_Int32(KTzParameters.Lx);
-                this.Ly       = KTzHeader.GetPar_Int32(KTzParameters.Ly);
-                this.Lz       = KTzHeader.GetPar_Int32(KTzParameters.Lz);
-                this.nNeurons = this.Lx * this.Ly * this.Lz;//Convert.ToInt32(Math.Pow(Lx, netDim));
-            }
+            this.Lx                = KTzHeader.GetPar_Int32(KTzParameters.Lx);
+            this.Ly                = KTzHeader.GetPar_Int32(KTzParameters.Ly);
+            this.Lz                = KTzHeader.GetPar_Int32(KTzParameters.Lz);
+            this.nNeurons          = this.Lx * this.Ly * this.Lz;//Convert.ToInt32(Math.Pow(Lx, netDim));
             this.netDim            = KTzHeader.GetPar_Int32(KTzParameters.dim);
             this.nNeighbours       = KTzHeader.GetPar_Int32(KTzParameters.nNeigh);
             this.numOfConnBAGraph  = KTzHeader.GetPar_Int32(KTzParameters.nConn);
@@ -194,17 +218,6 @@ namespace KTzV2.Sims.Network
              **
              **
              ***/
-            this.networkType       = (AdjacencyMatrixType)KTzHeader.GetPar_Int32(KTzParameters.netType);
-            this.synapseType       = (SynapseType)KTzHeader.GetPar_Int32(KTzParameters.sType);
-            this.neuronType        = (NeuronType)KTzHeader.GetPar_Int32(KTzParameters.neuron);
-            this.icType            = (InitialConditionType)KTzHeader.GetPar_Int32(KTzParameters.iCond);
-            this.countVar          = (KTzV2.Data.CountVariable)KTzHeader.GetPar_Int32(KTzParameters.cVar);
-            this.stimulusType      = (StimulusType)KTzHeader.GetPar_Int32(KTzParameters.stimType);
-            this.noiseType         = (KTzV2.Synapses.NoiseType)KTzHeader.GetPar_Int32(KTzParameters.noiseType);
-            this.couplingParamType = (CouplingParam)KTzHeader.GetPar_Int32(KTzParameters.coupParam);
-            this.indChoice         = (StimulusIndexChoice)KTzHeader.GetPar_Int32(KTzParameters.indChoice);
-            this.saveSpikeTimes    = KTzHeader.GetPar_Int32(KTzParameters.saveSpikeTimes) == 1;
-
             // adjusting RunForAvalanche
             this.ChooseRunForAvalancheMethods();
 
@@ -215,18 +228,27 @@ namespace KTzV2.Sims.Network
             this.ChooseTimestepUpdateMethod();
 
             // adjusting constant parameters
+            var simTimeScheme   = (SimulationTimeScheme)KTzHeader.GetPar_Int32(KTzParameters.simTimeScheme);
             this.nSteps         = KTzHeader.GetPar_Int32(KTzParameters.nSteps);
             this.nStartStep     = KTzHeader.GetPar_Int32(KTzParameters.nStart);
+            this.poissonRate    = KTzHeader.GetPar_Double(KTzParameters.r);
             this.tForStimulus   = KTzHeader.GetPar_Int32(KTzParameters.sStim);
             this.stimulusAmp    = KTzHeader.GetPar_Double(KTzParameters.I);
             this.stimulusStdDev = KTzHeader.GetPar_Double(KTzParameters.IStdDev);
-            this.poissonRate    = KTzHeader.GetPar_Double(KTzParameters.r);
             this.deltaTrainDt   = KTzHeader.GetPar_Int32(KTzParameters.deltaT);
             this.restIntervals  = KTzHeader.GetPar_Int32(KTzParameters.rest);
             this.timeBin        = KTzHeader.GetPar_Int32(KTzParameters.tBin);
             this.NAvalSim       = KTzHeader.GetPar_Int32(KTzParameters.nSim);
             this.neuronIndStim  = KTzHeader.GetPar_Int32(KTzParameters.iStim);
 
+            // adjusting total simulation time if needed
+            if ((simTimeScheme == SimulationTimeScheme.ProportionalToPoissonRate) && (this.stimulusType == StimulusType.PoissonProcess))
+            {
+                var T       = (int)(10.0D / (double)(this.poissonRate * this.nNeurons));
+                this.nSteps = this.nStartStep + T;
+                KTzHeader.SetPar(KTzParameters.nSteps, this.nSteps);
+                Console.WriteLine("WARNING ::: Auto-adjusting total simulation time to nSteps = nStartStep + {0:D}",T);
+            }
 
             /***
              **

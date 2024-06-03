@@ -390,6 +390,9 @@ namespace KTzV2.Data.Header
                 case KTzParameters.ParamForRange:
                     val = Enum.Parse(typeof(KTzV2.ParamForRangeInDynamicsSim), value, true);
                     break;
+                case KTzParameters.simTimeScheme:
+                    val = Enum.Parse(typeof(KTzV2.Sims.Network.SimulationTimeScheme), value, true);
+                    break;
                 case KTzParameters.avgInp:
                 case KTzParameters.wCSV:
                 case KTzParameters.wData:
@@ -913,6 +916,9 @@ namespace KTzV2.Data.Header
 
             KTzHeader.ParamDescription.Add(KTzParameters.stimType, "type of the stimulus" + Environment.NewLine + KTzHeader.GetEnumListStr<KTzV2.Stimuli.StimulusType>());
             KTzHeader.AddPar(KTzParameters.stimType, (Int32)KTzV2.Stimuli.StimulusType.Delta, KTzParamGroups.Stimulus, typeof(KTzV2.Stimuli.StimulusType));
+
+            KTzHeader.ParamDescription.Add(KTzParameters.simTimeScheme, "CAUTION: simulation will become VERY SLOW for small Poisson Rate r; if 'ProportionalToPoissonRate' then (nSteps - nStartStep) = 10/(r*N), where r-> Poisson rate; N=Lx*Ly*Lz (number of neurons)" + Environment.NewLine + KTzHeader.GetEnumListStr<KTzV2.Sims.Network.SimulationTimeScheme>());
+            KTzHeader.AddPar(KTzParameters.simTimeScheme, (Int32)KTzV2.Sims.Network.SimulationTimeScheme.Free, KTzParamGroups.Simulation, typeof(KTzV2.Sims.Network.SimulationTimeScheme));
 
             KTzHeader.ParamDescription.Add(KTzParameters.sStim, "timestep in which the network will be stimulated for each run");
             KTzHeader.AddPar(KTzParameters.sStim, 0, KTzParamGroups.Stimulus);
@@ -1722,6 +1728,10 @@ namespace KTzV2.Data.Header
         /// Simulation parameter - total timesteps to run each simulation
         /// </summary>
         nSteps,
+        /// <summary>
+        /// Simulation parameter - if "ProportionalToPoissonRate" then (nSteps - nStartStep) = 10/(r*N), where r-> Poisson rate; N=Lx*Ly*Lz (number of neurons)
+        /// </summary>
+        simTimeScheme,
         /// <summary>
         /// Simulation parameter - timestep in which the network starts to be recorded
         /// </summary>
