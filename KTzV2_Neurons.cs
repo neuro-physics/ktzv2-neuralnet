@@ -490,6 +490,17 @@ namespace KTzV2.Neurons
         {
             return this.x == 1.0;
         }
+
+        /// <summary>
+        /// checks if x corresponds to a spike
+        /// </summary>
+        /// <param name="x">membrane potential</param>
+        /// <param name="x_previous">previous membrane potential</param>
+        /// <returns>true if there is a spike</returns>
+        public virtual bool SpikeDetector(Double x, Double x_previous)
+        {
+            return x == 1.0;
+        }
     }
 
     /// <summary>
@@ -1201,6 +1212,17 @@ namespace KTzV2.Neurons
         {
             return (this.x * this.x_prev < 0.0) && (this.x_prev < this.x);
         }
+
+        /// <summary>
+        /// checks if the neuron is spiking
+        /// </summary>
+        /// <param name="x">membrane potential</param>
+        /// <param name="x_previous">previous membrane potential</param>
+        /// <returns>true if there is a spike</returns>
+        public virtual bool SpikeDetector(Double xx, Double x_previous)
+        {
+            return (xx * x_previous < 0.0) && (x_previous < xx);
+        }
     }
 
     public class SIElement : ThresholdElement
@@ -1365,6 +1387,17 @@ namespace KTzV2.Neurons
         {
             return this.x == 1.0;
         }
+
+        /// <summary>
+        /// checks if x corresponds to a spike
+        /// </summary>
+        /// <param name="x">membrane potential</param>
+        /// <param name="x_previous">previous membrane potential</param>
+        /// <returns>true if there is a spike</returns>
+        public virtual bool SpikeDetector(Double x, Double x_previous)
+        {
+            return x == 1.0;
+        }
     }
 
     /// <summary>
@@ -1426,5 +1459,13 @@ namespace KTzV2.Neurons
         /// </summary>
         /// <returns>returns true if the neuron is currently spiking, false otherwise</returns>
         bool SpikeDetector();
+
+        /// <summary>
+        /// Checks whether there is a spike given membrane potentials x in t and x_prev in t-1. Uses internal neuron rules
+        /// </summary>
+        /// <param name="x">membrane potential at time t</param>
+        /// <param name="x_previous">membrane potential at time t-1</param>
+        /// <returns>true if a spike is detected</returns>
+        bool SpikeDetector(Double x, Double x_previous);
     }
 }

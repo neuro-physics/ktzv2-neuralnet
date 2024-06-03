@@ -14,7 +14,7 @@ namespace KTzV2
         Dynamics,
         DynamicsWithinParamRange,
         Bifurcation,
-        KTzPhaseDiagram
+        DEPRECATEDKTzPhaseDiagram
     }
 
     public enum ParamForRangeInDynamicsSim
@@ -31,7 +31,7 @@ namespace KTzV2
     public enum BifurcationWritePolicy
     {
         OnTheFly,
-        OnTheEnd
+        InTheEnd
     }
 
     public enum OutputAverageMode
@@ -212,7 +212,7 @@ namespace KTzV2
                             Console.WriteLine("WARNING: running Avalanche/Dynamics simulation for many J defined by [minJ,maxJ] or JRange!");
                     }
 
-                    if (KTzHeader.GetPar_Int32(KTzParameters.wSpk) == 1)
+                    if (KTzHeader.GetPar_Int32(KTzParameters.wAvalDist) == 1)
                     {
                         chronometer.Reset();
                         Int32 k = 0;
@@ -469,7 +469,7 @@ namespace KTzV2
                         System.IO.File.Delete(tmpFileName);
                     }
                 }
-                else if ((SimulationType)KTzHeader.GetPar_Int32(KTzParameters.simType) == SimulationType.KTzPhaseDiagram)
+                else if ((SimulationType)KTzHeader.GetPar_Int32(KTzParameters.simType) == SimulationType.DEPRECATEDKTzPhaseDiagram)
                 {
                     Console.WriteLine("Nothing to do here!");
                     throw new NotImplementedException();

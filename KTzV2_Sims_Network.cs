@@ -20,6 +20,7 @@ namespace KTzV2.Sims.Network
         Fixed,
         SquareCenter,
         Random,
+        MultipleRandom,
         MostConnected
     }
 
@@ -47,13 +48,14 @@ namespace KTzV2.Sims.Network
         private Int32 tForStimulus;
         private Double x0i, y0i, z0i;
         private Double[] x0p, y0p, z0p;
-        private Double K, T, d, l, xR, H, J, tauf, taug, Theta;
-        private double Q;
+        private Double K, T, d, l, xR, H, J, tauf, taug, Theta, Q;
         private Double noiseAmp, noiseRatio;
         //private Double[] Ji;
         private GetICInstance icGetter;
         //private Int32[] tData;
         private Double[][] xData;
+        private List<Int32> spikeNeuronData;
+        private List<Int32> spikeTimeData;
         private Boolean hasRunned;
         //private KTNeuron[] neuron;
         private INeuron[] neuron;
@@ -92,6 +94,7 @@ namespace KTzV2.Sims.Network
         private Func<Int32> GetNeuronIndexForStim { get; set; }
         private Func<Int32> RunSingleAvalanche { get; set; }
         private Action<Int32> Update { get; set; }
+        private Action<Int32> UpdateDuringTransient { get; set; }
         private Action<Double[]> WriteRhoTimeSeriesFile { get; set; }
         public Action<String> WriteDataToFile { get; private set; }
         public Action<String, String> WriteSpikeDistributionToFile { get; private set; }
@@ -101,6 +104,7 @@ namespace KTzV2.Sims.Network
         private Boolean writeRhoTimeSeries; //simulation parameter - writes rho(t) for each J in JRange (only if outAvgMode=OverTime); rho(t) = sum x(t)>0
         private Boolean writeXDataFile;
         private Boolean writeXDataCSVFile;
+        private Boolean saveSpikeTimes;
         private KTzV2.Data.Header.OutputFileFormat outputFileFormat;
 
 #if DEBUG
@@ -151,74 +155,99 @@ namespace KTzV2.Sims.Network
 
         private void getSetOfParameters()
         {
-            if (this.networkType != AdjacencyMatrixType.FromFile)
-            {
-                this.Lx = KTzHeader.GetPar_Int32(KTzParameters.Lx);
-                this.Ly = KTzHeader.GetPar_Int32(KTzParameters.Ly);
-                this.Lz = KTzHeader.GetPar_Int32(KTzParameters.Lz);
-                this.nNeurons = this.Lx * this.Ly * this.Lz;//Convert.ToInt32(Math.Pow(Lx, netDim));
-            }
-            else
+            /***
+             **
+             **
+             ** Network parameters
+             **
+             **
+             ***/
+            if (this.networkType == AdjacencyMatrixType.FromFile)
             {
                 if (this.AMatrix != null)
+                {
                     this.nNeurons = this.AMatrix.nRow;
-            }
-
-            this.outputFileFormat = (KTzV2.Data.Header.OutputFileFormat)KTzHeader.GetPar_Int32(KTzParameters.oFileFormat);
-
-            this.writeRhoTimeSeries = KTzHeader.GetPar_Int32(KTzParameters.writeRhoTS) == 1;
-            if (this.outputFileFormat == OutputFileFormat.txt)
-            {
-                this.WriteRhoTimeSeriesFile = this.WriteRhoTimeSeriesFileTxt;
-                this.WriteDataToFile = this.WriteDataToFileTxt;
-                this.WriteSpikeDistributionToFile = this.WriteSpikeDistributionToFileTxt;
+                    this.Lx       = this.nNeurons;
+                    this.Ly       = 1;
+                    this.Lz       = 1;
+                }
+                KTzHeader.SetPar(KTzParameters.Lx, this.Lx);
+                KTzHeader.SetPar(KTzParameters.Ly, this.Ly);
+                KTzHeader.SetPar(KTzParameters.Lz, this.Lz);
             }
             else
             {
-                this.WriteRhoTimeSeriesFile = this.WriteRhoTimeSeriesFileMat;
-                this.WriteDataToFile = this.WriteDataToFileMat;
-                this.WriteSpikeDistributionToFile = this.WriteSpikeDistributionToFileMat;
+                this.Lx       = KTzHeader.GetPar_Int32(KTzParameters.Lx);
+                this.Ly       = KTzHeader.GetPar_Int32(KTzParameters.Ly);
+                this.Lz       = KTzHeader.GetPar_Int32(KTzParameters.Lz);
+                this.nNeurons = this.Lx * this.Ly * this.Lz;//Convert.ToInt32(Math.Pow(Lx, netDim));
             }
-
-            this.writeXDataFile = KTzHeader.GetPar_Int32(KTzParameters.wData) == 1;
-            this.writeXDataCSVFile = KTzHeader.GetPar_Int32(KTzParameters.wCSV) == 1;
-
-            this.J = KTzHeader.GetPar_Double(KTzParameters.J);
-            this.nSteps = KTzHeader.GetPar_Int32(KTzParameters.nSteps);
-            this.nStartStep = KTzHeader.GetPar_Int32(KTzParameters.nStart);
-            this.networkType = (AdjacencyMatrixType)KTzHeader.GetPar_Int32(KTzParameters.netType);
-
-            this.synapseType = (SynapseType)KTzHeader.GetPar_Int32(KTzParameters.sType);
-            if ((this.synapseType == SynapseType.GapJunction) ||
-                (this.synapseType == SynapseType.PulseCoupling))
-            {
-                this.Update = this.UpdateOnlyNeurons;
-            }
-            else
-            {
-                this.Update = this.UpdateWithDynamicSynapses;
-            }
-
-            this.neuronType = (NeuronType)KTzHeader.GetPar_Int32(KTzParameters.neuron);
-            this.icType = (InitialConditionType)KTzHeader.GetPar_Int32(KTzParameters.iCond);
-            this.doWriteDif = false;
-            if (KTzHeader.GetPar_Int32(KTzParameters.wDif) == 1)
-                Console.WriteLine("WARNING: parameter wDif has no effect anymore");
-            this.netDim = KTzHeader.GetPar_Int32(KTzParameters.dim);
-            this.tForStimulus = KTzHeader.GetPar_Int32(KTzParameters.sStim);
-            this.stimulusAmp = KTzHeader.GetPar_Double(KTzParameters.I);
-            this.stimulusStdDev = KTzHeader.GetPar_Double(KTzParameters.IStdDev);
-            this.poissonRate = KTzHeader.GetPar_Double(KTzParameters.r);
-
-            this.stimulusType = (StimulusType)KTzHeader.GetPar_Int32(KTzParameters.stimType);
-            this.deltaTrainDt = KTzHeader.GetPar_Int32(KTzParameters.deltaT);
-            this.restIntervals = KTzHeader.GetPar_Int32(KTzParameters.rest);
-            this.timeBin = KTzHeader.GetPar_Int32(KTzParameters.tBin);
-            this.NAvalSim = KTzHeader.GetPar_Int32(KTzParameters.nSim);
-
-            this.nNeighbours = KTzHeader.GetPar_Int32(KTzParameters.nNeigh);
-            this.numOfConnBAGraph = KTzHeader.GetPar_Int32(KTzParameters.nConn);
+            this.netDim            = KTzHeader.GetPar_Int32(KTzParameters.dim);
+            this.nNeighbours       = KTzHeader.GetPar_Int32(KTzParameters.nNeigh);
+            this.numOfConnBAGraph  = KTzHeader.GetPar_Int32(KTzParameters.nConn);
             this.rewireProbWSGraph = KTzHeader.GetPar_Double(KTzParameters.rewP);
+
+            /***
+             **
+             **
+             ** Simulation parameters
+             **
+             **
+             ***/
+            this.networkType       = (AdjacencyMatrixType)KTzHeader.GetPar_Int32(KTzParameters.netType);
+            this.synapseType       = (SynapseType)KTzHeader.GetPar_Int32(KTzParameters.sType);
+            this.neuronType        = (NeuronType)KTzHeader.GetPar_Int32(KTzParameters.neuron);
+            this.icType            = (InitialConditionType)KTzHeader.GetPar_Int32(KTzParameters.iCond);
+            this.countVar          = (KTzV2.Data.CountVariable)KTzHeader.GetPar_Int32(KTzParameters.cVar);
+            this.stimulusType      = (StimulusType)KTzHeader.GetPar_Int32(KTzParameters.stimType);
+            this.noiseType         = (KTzV2.Synapses.NoiseType)KTzHeader.GetPar_Int32(KTzParameters.noiseType);
+            this.couplingParamType = (CouplingParam)KTzHeader.GetPar_Int32(KTzParameters.coupParam);
+            this.indChoice         = (StimulusIndexChoice)KTzHeader.GetPar_Int32(KTzParameters.indChoice);
+            this.saveSpikeTimes    = KTzHeader.GetPar_Int32(KTzParameters.saveSpikeTimes) == 1;
+
+            // adjusting RunForAvalanche
+            this.ChooseRunForAvalancheMethods();
+
+            // adjusting output writers
+            this.ChooseOutputMethods();
+            
+            // adjusting time step update function
+            this.ChooseTimestepUpdateMethod();
+
+            // adjusting constant parameters
+            this.nSteps         = KTzHeader.GetPar_Int32(KTzParameters.nSteps);
+            this.nStartStep     = KTzHeader.GetPar_Int32(KTzParameters.nStart);
+            this.tForStimulus   = KTzHeader.GetPar_Int32(KTzParameters.sStim);
+            this.stimulusAmp    = KTzHeader.GetPar_Double(KTzParameters.I);
+            this.stimulusStdDev = KTzHeader.GetPar_Double(KTzParameters.IStdDev);
+            this.poissonRate    = KTzHeader.GetPar_Double(KTzParameters.r);
+            this.deltaTrainDt   = KTzHeader.GetPar_Int32(KTzParameters.deltaT);
+            this.restIntervals  = KTzHeader.GetPar_Int32(KTzParameters.rest);
+            this.timeBin        = KTzHeader.GetPar_Int32(KTzParameters.tBin);
+            this.NAvalSim       = KTzHeader.GetPar_Int32(KTzParameters.nSim);
+            this.neuronIndStim  = KTzHeader.GetPar_Int32(KTzParameters.iStim);
+
+
+            /***
+             **
+             **
+             ** Synapse parameters
+             **
+             **
+             ***/
+            if (this.couplingParamType == CouplingParam.Homogeneous)
+                this.GetJValue = this.GetJValueHomogeneous;
+            else
+                this.GetJValue = this.GetJValueAdjMatrix;
+            this.J           = KTzHeader.GetPar_Double(KTzParameters.J);
+            this.tauf        = KTzHeader.GetPar_Double(KTzParameters.tauf);
+            this.taug        = KTzHeader.GetPar_Double(KTzParameters.taug);
+            this.noiseAmp    = KTzHeader.GetPar_Double(KTzParameters.R);
+            this.noiseRatio  = KTzHeader.GetPar_Double(KTzParameters.noiseRatio);
+            this.dyn_alpha   = KTzHeader.GetPar_Double(KTzParameters.alpha);
+            this.dyn_u       = KTzHeader.GetPar_Double(KTzParameters.u);
+            this.dyn_tauJ    = KTzHeader.GetPar_Double(KTzParameters.tauJ);
+            this.dyn_dt      = KTzHeader.GetPar_Double(KTzParameters.dt);
 
             this.hasToAverageInput = KTzHeader.GetPar_Int32(KTzParameters.avgInp) == 1;
             if ((neuronType == NeuronType.KTzLogMF) || (neuronType == NeuronType.KTzMF))
@@ -226,43 +255,53 @@ namespace KTzV2.Sims.Network
                 this.hasToAverageInput = true;
             }
 
-            this.noiseType = (KTzV2.Synapses.NoiseType)KTzHeader.GetPar_Int32(KTzParameters.noiseType);
-            this.noiseAmp = KTzHeader.GetPar_Double(KTzParameters.R);
-            this.noiseRatio = KTzHeader.GetPar_Double(KTzParameters.noiseRatio);
-
-            this.dyn_alpha = KTzHeader.GetPar_Double(KTzParameters.alpha);
-            this.dyn_u = KTzHeader.GetPar_Double(KTzParameters.u);
-            this.dyn_tauJ = KTzHeader.GetPar_Double(KTzParameters.tauJ);
-            this.dyn_dt = KTzHeader.GetPar_Double(KTzParameters.dt);
-
-            this.K = KTzHeader.GetPar_Double(KTzParameters.K);
-            this.T = KTzHeader.GetPar_Double(KTzParameters.T);
-            this.d = KTzHeader.GetPar_Double(KTzParameters.d);
-            this.l = KTzHeader.GetPar_Double(KTzParameters.l);
-            this.xR = KTzHeader.GetPar_Double(KTzParameters.xR);
-            this.H = KTzHeader.GetPar_Double(KTzParameters.H);
-            this.Q = KTzHeader.GetPar_Double(KTzParameters.Q);
-            this.tauf = KTzHeader.GetPar_Double(KTzParameters.tauf);
-            this.taug = KTzHeader.GetPar_Double(KTzParameters.taug);
-            this.x0i = KTzHeader.GetPar_Double(KTzParameters.x0);
-            this.y0i = KTzHeader.GetPar_Double(KTzParameters.y0);
-            this.z0i = KTzHeader.GetPar_Double(KTzParameters.z0);
+            /***
+             **
+             **
+             ** Neuron parameters
+             **
+             **
+             ***/
+            this.K     = KTzHeader.GetPar_Double(KTzParameters.K);
+            this.T     = KTzHeader.GetPar_Double(KTzParameters.T);
+            this.d     = KTzHeader.GetPar_Double(KTzParameters.d);
+            this.l     = KTzHeader.GetPar_Double(KTzParameters.l);
+            this.xR    = KTzHeader.GetPar_Double(KTzParameters.xR);
+            this.H     = KTzHeader.GetPar_Double(KTzParameters.H);
+            this.Q     = KTzHeader.GetPar_Double(KTzParameters.Q);
+            this.x0i   = KTzHeader.GetPar_Double(KTzParameters.x0);
+            this.y0i   = KTzHeader.GetPar_Double(KTzParameters.y0);
+            this.z0i   = KTzHeader.GetPar_Double(KTzParameters.z0);
             this.Theta = KTzHeader.GetPar_Double(KTzParameters.Theta);
 
-            this.couplingParamType = (CouplingParam)KTzHeader.GetPar_Int32(KTzParameters.coupParam);
-            if (this.couplingParamType == CouplingParam.Homogeneous)
-                this.GetJValue = this.GetJValueHomogeneous;
-            else
-                this.GetJValue = this.GetJValueAdjMatrix;
 
-            var dynType = (KTzV2.DynamicsSimType)KTzHeader.GetPar_Int32(KTzParameters.dynType);
-            if ((this.stimulusType != StimulusType.DeltaWhenInactive) &&
-                ((KTzV2.SimulationType)KTzHeader.GetPar_Int32(KTzParameters.simType) == KTzV2.SimulationType.Dynamics))
+            this.doWriteDif = false;
+            if (KTzHeader.GetPar_Int32(KTzParameters.wDif) == 1)
+                Console.WriteLine("WARNING: parameter wDif has no effect anymore");
+        }
+
+        private void ChooseRunForAvalancheMethods()
+        {
+            var dynType            = (KTzV2.DynamicsSimType)KTzHeader.GetPar_Int32(KTzParameters.dynType);
+            var simType            = (KTzV2.SimulationType)KTzHeader.GetPar_Int32(KTzParameters.simType);
+
+            // if we want to run the dynamics (instead of bifurcation)
+            // and the stimulus IS NOT DeltaWhenInactive
+            // we force the simulation to be "ContinuousTime"
+            if ((this.stimulusType != StimulusType.DeltaWhenInactive) && (simType == KTzV2.SimulationType.Dynamics))
             {
                 dynType = KTzV2.DynamicsSimType.ContinuousTime;
                 KTzHeader.SetPar(KTzParameters.dynType, (Int32)KTzV2.DynamicsSimType.ContinuousTime);
                 Console.WriteLine("WARNING: Forcing dynType == ContinuousTime because stimType != DeltaWhenInactive");
             }
+
+            if (dynType == KTzV2.DynamicsSimType.NetworkReset)
+            {
+                this.stimulusType = StimulusType.DeltaWhenInactive;
+                KTzHeader.SetPar(KTzParameters.stimType, (Int32)StimulusType.DeltaWhenInactive);
+                Console.WriteLine("WARNING: Forcing stimType == DeltaWhenInactive because dynType == NetworkReset");
+            }
+
             if (dynType == KTzV2.DynamicsSimType.ContinuousTime)
             {
                 this.RunForAvalanches = RunForSpikeDistribution;
@@ -270,22 +309,70 @@ namespace KTzV2.Sims.Network
             else if (dynType == KTzV2.DynamicsSimType.NetworkReset)
             {
                 this.RunForAvalanches = RunForSpikeDistReset;
-                this.stimulusType = StimulusType.Delta;
+                this.stimulusType     = StimulusType.Delta;
+                KTzHeader.SetPar(KTzParameters.stimType, (int)this.stimulusType);
             }
 
-            this.indChoice = (StimulusIndexChoice)KTzHeader.GetPar_Int32(KTzParameters.indChoice);
-            this.neuronIndStim = KTzHeader.GetPar_Int32(KTzParameters.iStim);
-
-            /*** counting variable ***/
-            this.countVar = (KTzV2.Data.CountVariable)KTzHeader.GetPar_Int32(KTzParameters.cVar);
+            // adjusting RunSingleAvalanche
             if (this.countVar == CountVariable.NumberOfNeurons)
-            {
                 this.RunSingleAvalanche = this.RunSingleAvalancheForNeurons;
-            }
             else if (this.countVar == CountVariable.NumberOfSpikes)
-            {
                 this.RunSingleAvalanche = this.RunSingleAvalancheForSpike;
+        }
+
+        private void ChooseOutputMethods()
+        {
+            this.outputFileFormat   = (KTzV2.Data.Header.OutputFileFormat)KTzHeader.GetPar_Int32(KTzParameters.oFileFormat);
+            if (this.outputFileFormat == OutputFileFormat.txt)
+            {
+                this.WriteRhoTimeSeriesFile       = this.WriteRhoTimeSeriesFileTxt;
+                this.WriteDataToFile              = this.WriteDataToFileTxt;
+                this.WriteSpikeDistributionToFile = this.WriteSpikeDistributionToFileTxt;
             }
+            else
+            {
+                this.WriteRhoTimeSeriesFile       = this.WriteRhoTimeSeriesFileMat;
+                this.WriteDataToFile              = this.WriteDataToFileMat;
+                this.WriteSpikeDistributionToFile = this.WriteSpikeDistributionToFileMat;
+            }
+            this.writeRhoTimeSeries = KTzHeader.GetPar_Int32(KTzParameters.writeRhoTS) == 1;
+            this.writeXDataFile     = KTzHeader.GetPar_Int32(KTzParameters.wData) == 1;
+            this.writeXDataCSVFile  = KTzHeader.GetPar_Int32(KTzParameters.wCSV) == 1;
+        }
+
+        private void ChooseTimestepUpdateMethod()
+        {
+            if (this.saveSpikeTimes)
+            {
+                if (this.indChoice == StimulusIndexChoice.MultipleRandom)
+                {
+                    this.Update                = this.UpdateForMultipleStimSaveSpike;
+                    this.UpdateDuringTransient = this.UpdateForMultipleStim;
+                }
+                else
+                {
+                    this.Update                = this.UpdateSingleStimSaveSpike;
+                    this.UpdateDuringTransient = this.UpdateSingleStim;
+                }
+            }
+            else
+            {
+                if (this.indChoice == StimulusIndexChoice.MultipleRandom)
+                {
+                    this.Update                = this.UpdateForMultipleStim;
+                    this.UpdateDuringTransient = this.UpdateForMultipleStim;
+                }
+                else
+                {
+                    this.Update                = this.UpdateSingleStim;
+                    this.UpdateDuringTransient = this.UpdateSingleStim;
+                }
+            }
+        }
+
+        private Int32 GetNeuronIndForStimAll()
+        {
+            return -1;
         }
 
         private Int32 GetNeuronIndForStimRandom()
@@ -301,17 +388,17 @@ namespace KTzV2.Sims.Network
         private void GetSampParAndSetSamplingIndices()
         {
             this.samplingFraction = KTzHeader.GetPar_Double(KTzParameters.sampFrac);
-            this.samplingType = (KTzV2.Data.NetworkSamplingType)KTzHeader.GetPar_Int32(KTzParameters.samp);
-            this.samplingN = (Int32)(this.samplingFraction * this.nNeurons);
+            this.samplingType     = (KTzV2.Data.NetworkSamplingType)KTzHeader.GetPar_Int32(KTzParameters.samp);
+            this.samplingN        = (Int32)(this.samplingFraction * this.nNeurons);
             if (this.samplingN == this.nNeurons)
                 this.samplingType = NetworkSamplingType.Full;
 
             Int32 i;
             if (this.samplingType == KTzV2.Data.NetworkSamplingType.Full)
             {
-                this.unsampledIndices = null;
-                this.samplingN = this.nNeurons;
-                this.samplingIndices = new Int32[this.samplingN];
+                this.unsampledIndices = new Int32[] {};
+                this.samplingN        = this.nNeurons;
+                this.samplingIndices  = new Int32[this.samplingN];
                 i = 0;
                 while (i < this.samplingN)
                 {
@@ -321,7 +408,7 @@ namespace KTzV2.Sims.Network
             }
             else if (this.samplingType == KTzV2.Data.NetworkSamplingType.Partial)
             {
-                this.samplingN = (Int32)(this.samplingFraction * this.nNeurons);
+                this.samplingN       = (Int32)(this.samplingFraction * this.nNeurons);
                 this.samplingIndices = new Int32[this.samplingN];
                 List<Int32> selected = new List<Int32>();
                 Int32 n;
@@ -397,15 +484,17 @@ namespace KTzV2.Sims.Network
             {
                 //neuron[i] = new KTzNeuron(i, K, T, d, l, xR, x0[i], y0[i], z0[i]);
                 // I have to get the parameters here again because these parameters may have quenched disorder
-                this.K = KTzHeader.GetPar_Double(KTzParameters.K);
-                this.T = KTzHeader.GetPar_Double(KTzParameters.T);
-                this.d = KTzHeader.GetPar_Double(KTzParameters.d);
-                this.l = KTzHeader.GetPar_Double(KTzParameters.l);
-                this.xR = KTzHeader.GetPar_Double(KTzParameters.xR);
-                this.H = KTzHeader.GetPar_Double(KTzParameters.H);
-                this.Q = KTzHeader.GetPar_Double(KTzParameters.Q);
-                this.Theta = KTzHeader.GetPar_Double(KTzParameters.Theta);
-                this.neuron[i] = NeuronFactory.GetKTNeuron(this.neuronType, new NeuronParam(i, this.K, this.T, this.d, this.l, this.xR, this.H, this.x0p[i], this.y0p[i], this.z0p[i], this.Theta, Q: this.Q));
+                this.K         = KTzHeader.GetPar_Double(KTzParameters.K);
+                this.T         = KTzHeader.GetPar_Double(KTzParameters.T);
+                this.d         = KTzHeader.GetPar_Double(KTzParameters.d);
+                this.l         = KTzHeader.GetPar_Double(KTzParameters.l);
+                this.xR        = KTzHeader.GetPar_Double(KTzParameters.xR);
+                this.H         = KTzHeader.GetPar_Double(KTzParameters.H);
+                this.Q         = KTzHeader.GetPar_Double(KTzParameters.Q);
+                this.Theta     = KTzHeader.GetPar_Double(KTzParameters.Theta);
+                this.neuron[i] = NeuronFactory.GetKTNeuron(this.neuronType,
+                                                           new NeuronParam(i, this.K, this.T, this.d, this.l, this.xR, this.H, this.x0p[i], this.y0p[i], this.z0p[i], this.Theta, Q: this.Q)
+                                                           );
                 this.countedNeuron[i] = false;
                 i++;
             }
@@ -425,14 +514,14 @@ namespace KTzV2.Sims.Network
                 while (j < k)
                 {
                     // I have to retrieve these parameters because they may be subject to quenched disorder
-                    this.J = this.GetJValue(j);
-                    this.tauf = KTzHeader.GetPar_Double(KTzParameters.tauf);
-                    this.taug = KTzHeader.GetPar_Double(KTzParameters.taug);
-                    this.noiseAmp = KTzHeader.GetPar_Double(KTzParameters.R);
+                    this.J          = this.GetJValue(j);
+                    this.tauf       = KTzHeader.GetPar_Double(KTzParameters.tauf);
+                    this.taug       = KTzHeader.GetPar_Double(KTzParameters.taug);
+                    this.noiseAmp   = KTzHeader.GetPar_Double(KTzParameters.R);
                     this.noiseRatio = KTzHeader.GetPar_Double(KTzParameters.noiseRatio);
-                    this.dyn_alpha = KTzHeader.GetPar_Double(KTzParameters.alpha);
-                    this.dyn_u = KTzHeader.GetPar_Double(KTzParameters.u);
-                    this.dyn_tauJ = KTzHeader.GetPar_Double(KTzParameters.tauJ);
+                    this.dyn_alpha  = KTzHeader.GetPar_Double(KTzParameters.alpha);
+                    this.dyn_u      = KTzHeader.GetPar_Double(KTzParameters.u);
+                    this.dyn_tauJ   = KTzHeader.GetPar_Double(KTzParameters.tauJ);
                     this.synapseList.Add(
                             SynapseFactory.GetSynapse(
                                 this.synapseType, new SynapseParam(this.neuron[preNeuronsInd[j]], this.neuron[i],
@@ -481,9 +570,17 @@ namespace KTzV2.Sims.Network
                     this.neuronIndStim = this.GetMostConnectedNeuronIndex();
                     this.GetNeuronIndexForStim = GetNeuronIndForStimSimple;
                 }
-                else
+                else if (this.indChoice == StimulusIndexChoice.Random)
                 {
                     this.GetNeuronIndexForStim = GetNeuronIndForStimRandom;
+                }
+                else if (this.indChoice == StimulusIndexChoice.MultipleRandom)
+                {
+                    this.GetNeuronIndexForStim = GetNeuronIndForStimAll;
+                }
+                else
+                {
+                    throw new ArgumentOutOfRangeException("Unknown StimulusIndexChoice");
                 }
             }
             else
@@ -498,7 +595,7 @@ namespace KTzV2.Sims.Network
 
         private Int32 GetSquareCenterIndex()
         {
-            return (this.networkType == AdjacencyMatrixType.SquareLatticeFreeBC || this.networkType == AdjacencyMatrixType.SquareLatticePeriodicBC ? ((Int32)Math.Floor(this.Lx / 2.0D) * this.Ly + (Int32)Math.Floor(this.Lx / 2.0D)) : (this.nNeurons / 2));
+            return (this.networkType == AdjacencyMatrixType.SquareLatticeFreeBC || this.networkType == AdjacencyMatrixType.SquareLatticePeriodicBC) ? ((Int32)Math.Floor(this.Lx / 2.0D) * this.Ly + (Int32)Math.Floor(this.Lx / 2.0D)) : (this.nNeurons / 2);
         }
 
         private Int32 GetMostConnectedNeuronIndex()
@@ -558,7 +655,7 @@ namespace KTzV2.Sims.Network
 
         private void ResetNeuronsAndSynapses()
         {
-            this.timestep = 0;
+            this.timestep = -1;
             int i = 0;
             while (i < this.nNeurons)
             {
@@ -568,33 +665,43 @@ namespace KTzV2.Sims.Network
             this.synapseList.ForEach(ss => ss.ResetSignal());
         }
 
-        /// <summary>
-        /// updates this network 1 timestep and the given neuron to stimulate
-        /// if synapses have any intrinsic dynamics
-        /// </summary>
-        /// <param name="i">index of the neuron to stimulate</param>
-        private void UpdateWithDynamicSynapses(Int32 i)
+        private void SaveSpikeTime(int neuronInd, int time)
+        {
+            this.spikeNeuronData.Add(neuronInd);
+            this.spikeTimeData.Add(time);
+        }
+
+        private void UpdateSingleStimSaveSpike(Int32 i = 0)
         {
             // evaluating the output synapses of each neuron
-            Int32 j = 0;
-            while (j < this.nSynapse)
+            Int32 k = 0, j;
+            while (k < this.nSynapse)
             {
-                synapseList[j].Evolve();
-                j++;
+                synapseList[k].Evolve();
+                k++;
             }
             // evaluating the membrane potential of each neuron
-            j = 0;
-            while (j < i)
+            k = 0;
+            while (k < this.samplingIndices.Length)
             {
-                neuron[j].Evolve();
-                j++;
+                j = this.samplingIndices[k];
+                if (j == i)
+                    neuron[j].Evolve();
+                else
+                    neuron[j].Evolve(stimulus.GetSignal(this.timestep));
+                if (neuron[j].SpikeDetector())
+                    this.SaveSpikeTime(j, this.timestep);
+                k++;
             }
-            neuron[j].Evolve(stimulus.GetSignal(this.timestep));
-            j++;
-            while (j < this.nNeurons)
+            k = 0;
+            while (k < this.unsampledIndices.Length)
             {
-                neuron[j].Evolve();
-                j++;
+                j = this.unsampledIndices[k];
+                if (j == i)
+                    neuron[j].Evolve();
+                else
+                    neuron[j].Evolve(stimulus.GetSignal(this.timestep));
+                k++;
             }
         }
 
@@ -603,7 +710,7 @@ namespace KTzV2.Sims.Network
         /// if synapses have no dynamics at all (Pulse coupling or GapJunction)
         /// </summary>
         /// <param name="i">index of the neuron to stimulate</param>
-        private void UpdateOnlyNeurons(Int32 i)
+        private void UpdateSingleStim(Int32 i = 0)
         {
             // evaluating the output synapses of each neuron
             Int32 j = 0;
@@ -628,35 +735,82 @@ namespace KTzV2.Sims.Network
             }
         }
 
+        private void UpdateForMultipleStimSaveSpike(Int32 i = 0)
+        {
+            // evaluating the output synapses of each neuron
+            Int32 k = 0, j;
+            while (k < this.nSynapse)
+            {
+                synapseList[k].Evolve();
+                k++;
+            }
+            // evaluating the membrane potential of each neuron
+            k = 0;
+            while (k < this.samplingIndices.Length)
+            {
+                j = this.samplingIndices[k];
+                neuron[j].Evolve(stimulus.GetSignal(this.timestep));
+                if (neuron[j].SpikeDetector())
+                    this.SaveSpikeTime(j, this.timestep);
+                k++;
+            }
+            k = 0;
+            while (k < this.unsampledIndices.Length)
+            {
+                neuron[this.unsampledIndices[k]].Evolve(stimulus.GetSignal(this.timestep));
+                k++;
+            }
+        }
+
+        private void UpdateForMultipleStim(Int32 i = 0)
+        {
+            // evaluating the output synapses of each neuron
+            Int32 j = 0;
+            while (j < this.nSynapse)
+            {
+                synapseList[j].Evolve();
+                j++;
+            }
+            // evaluating the membrane potential of each neuron
+            j = 0;
+            while (j < this.nNeurons)
+            {
+                neuron[j].Evolve(stimulus.GetSignal(this.timestep));
+                j++;
+            }
+        }
+
         /// <summary>
         /// prepares this simulation... prepares the data vars, the neurons, the connections and the stimulus
         /// </summary>
-        private void prepareToRunWithData()
+        private void prepareToRunWithData(bool recordXData = true)
         {
-            this.prepareToRunWithData(this.nSteps - this.nStartStep + 1);
+            this.prepareToRunWithData(this.nSteps - this.nStartStep + 1, recordXData);
         }
 
         /// <summary>
         /// prepares the simulation to store an defined amount of data
         /// </summary>
         /// <param name="amountOfData">the amount of data to be stored (amount of timesteps that simulation will run)</param>
-        private void prepareToRunWithData(Int32 amountOfData)
+        private void prepareToRunWithData(Int32 amountOfData, bool recordXData = true)
         {
-            Int32 i;
-
             this.prepareToRun();
-
-            this.xData = new Double[this.nNeurons][];
-            //this.tData = new Int32[amountOfData];
-            i = 0;
-            while (i < this.nNeurons)
+            if (recordXData)
             {
-                this.xData[i] = new Double[amountOfData];
-                i++;
+                this.xData = new Double[this.nNeurons][];
+                //this.tData = new Int32[amountOfData];
+                Int32 i = 0;
+                while (i < this.nNeurons)
+                {
+                    this.xData[i] = new Double[amountOfData];
+                    i++;
+                }
             }
 
-            this.spikeDistribution = new List<Int32>();
-            this.timeDistribution = new List<Int32>();
+            this.spikeNeuronData   = new List<int>();
+            this.spikeTimeData     = new List<int>();
+            this.spikeDistribution = new List<int>();
+            this.timeDistribution  = new List<int>();
         }
 
         private void prepareToRun()
@@ -669,14 +823,14 @@ namespace KTzV2.Sims.Network
         /// <summary>
         /// runs the simulation for a random neuron index for stimulus
         /// </summary>
-        public void Run(Int32? indToStimulate = null)
+        public void Run(Int32? indToStimulate = null, bool recordXData = true)
         {
             if (hasRunned)
             {
                 throw new Exception("Simulation already runned!");
             }
 
-            this.prepareToRunWithData();
+            this.prepareToRunWithData(recordXData);
 
             if (indToStimulate.HasValue)
             {
@@ -684,20 +838,21 @@ namespace KTzV2.Sims.Network
                 this.neuronIndStim = indToStimulate.Value;
             }
 
-            this.timestep = 0;
+            this.timestep = -1;
             while (this.timestep < this.nStartStep)
             {
-                this.Update(GetNeuronIndexForStim());
                 this.timestep++;
+                this.UpdateDuringTransient(GetNeuronIndexForStim());
             }
-            if (this.stimulusType == StimulusType.DeltaWhenInactive)
+            if (recordXData)
             {
-                this.RunDeltaInactive(this.nSteps - this.nStartStep + 1);
+                if (this.stimulusType == StimulusType.DeltaWhenInactive)
+                    this.RunDeltaInactive(this.nSteps - this.nStartStep + 1);
+                else
+                    this.RunAndRecordTimeLength(this.nSteps - this.nStartStep + 1);
             }
             else
-            {
-                this.RunAndRecordTimeLength(this.nSteps - this.nStartStep + 1);
-            }
+                this.RunTimeLength(this.nSteps - this.nStartStep + 1);
 
             hasRunned = true;
         }
@@ -713,7 +868,7 @@ namespace KTzV2.Sims.Network
                 xDataTemp[i] = new Double[tMax];
             }
 
-            this.timestep = 0;
+            this.timestep = -1;
             while (t < tMax)
             {
                 // running the simulation on this bin
@@ -725,7 +880,7 @@ namespace KTzV2.Sims.Network
                 if ((countTemp == 0) && this.IsThereNoActivityInUnsampledData()) // if there's no activity in complete sampled data
                 {
                     if (this.stimulus.timeForStimulus < t)
-                        this.stimulus.SetNextStimulusTime(this.timestep + this.restIntervals * this.timeBin); // set the next stimulus timestep
+                        this.stimulus.SetNextStimulusTime(1+this.timestep + this.restIntervals * this.timeBin); // set the next stimulus timestep
                 }
 
                 // setting the start of the next bin
@@ -751,35 +906,19 @@ namespace KTzV2.Sims.Network
             // simulation has to run many times
             //
             //
-            this.Run(indSt);
+            if (this.saveSpikeTimes)
+                this.Run(indSt, recordXData: false);
+            else
+                this.Run(indSt);
 
-            //Func<Double, Double> linearTransf;
-            //if (this.neuronType.ToString().Contains("KT"))
-            //    linearTransf = x => (x + 1.0D) / 2.0D;
-            //else
-            //    linearTransf = x => x;
+            Double[] rho_t;
+            Double rho, rho2, rho4, rhoMax;
+            Int32 t_total;
+            if (this.saveSpikeTimes)
+                this.GenerateRhoTimeSeriesFromSpikeData(out rho_t, out rho, out rho2, out rho4, out rhoMax, out t_total);
+            else
+                this.GenerateRhoTimeSeriesFromXData(out rho_t, out rho, out rho2, out rho4, out rhoMax, out t_total);
 
-            Int32 t = 0, tt = this.xData[0].Length, i;
-            Double rho = 0.0D, rho2 = 0.0D, rho4 = 0.0D, rhoMax = 0.0D;
-            Double[] rho_t = new Double[tt];
-            while (t < tt)
-            {
-                rho_t[t] = 0.0D;
-                i = 0;
-                while (i < this.nNeurons)
-                {
-                    //rho_t[t] += linearTransf(this.xData[i][t]); // transforming xData from [-1;1] to [0;1] if needed
-                    rho_t[t] += (this.xData[i][t] > 0.0D ? 1.0D : 0.0D); // summing up only the spikes
-                    i++;
-                }
-                rho_t[t] /= this.nNeurons;
-                rho += rho_t[t];
-                rho2 += rho_t[t] * rho_t[t];
-                rho4 += rho_t[t] * rho_t[t] * rho_t[t] * rho_t[t];
-                if (rho_t[t] > rhoMax)
-                    rhoMax = rho_t[t];
-                t++;
-            }
 
             if (this.writeRhoTimeSeries)
                 this.WriteRhoTimeSeriesFile(rho_t);
@@ -792,13 +931,104 @@ namespace KTzV2.Sims.Network
             // mean has to be taken over many realizations
             //
             //
-            return new ThermoStatistics(rho / (Double)tt, rho2 / (Double)tt, rho4 / (Double)tt, rho_t, rhoMax, tt);
+            return new ThermoStatistics(rho, rho2, rho4, rho_t, rhoMax, t_total);
+        }
+
+        private void GenerateRhoTimeSeriesFromSpikeData(out Double[] rho_t, out Double rho, out Double rho2, out Double rho4, out Double rhoMax, out Int32 t_total)
+        {
+            Double n_sample = (Double)this.samplingIndices.Length;
+            t_total         = -1;
+            Double rho_tmp  = 0.0D;
+            rho             = 0.0D;
+            rho2            = 0.0D;
+            rho4            = 0.0D;
+            rhoMax          = 0.0D;
+            var rho_t_list  = new List<Double>();
+            var n           = 1; // number of neurons that spiked at t0
+            var t0          = this.spikeTimeData[0]; // instant of a spike
+            var t0_prev     = -1;
+            for (var k = 1; k < this.spikeTimeData.Count; k++)
+            {
+                // if there is some spike at t0
+                if (this.spikeTimeData[k] == t0)
+                {
+                    n++; // then another neuron spiked at this time
+                }
+                else // otherwise, we restart counting the spike for a new t0
+                {
+                    // calculating the fraction of spikes in time t0
+                    rho_tmp = (Double)n / n_sample;
+
+                    // resetting spike time
+                    t0_prev = t0;
+                    n       = 1; // there is already one spike at this new t0
+                    t0      = this.spikeTimeData[k]; // this is the new spike instant
+
+                    // recording the fraction of spikes in the sampled data
+                    rho_t_list.Add(rho_tmp);
+                    // filling with zeros if needed
+                    if ((t0 - t0_prev) > 1) // if the next spike did not happen immediately
+                        rho_t_list.AddRange(Enumerable.Range(t0_prev,t0-1-t0_prev).Select(k=>0.0D)); // we add a bunch of zeros since the network remained silent during (t0-1-t0_prev) time steps
+                    
+                    // calculating means
+                    // the zeros added to the list don't change the sums below
+                    rho  += rho_tmp;
+                    rho2 += rho_tmp * rho_tmp;
+                    rho4 += rho_tmp * rho_tmp * rho_tmp * rho_tmp;
+                }
+            }
+            rho_t   = rho_t_list.ToArray();
+            t_total = rho_t.Length;
+            rho    /= (Double)t_total;
+            rho2   /= (Double)t_total;
+            rho4   /= (Double)t_total;
+        }
+
+        private void GenerateRhoTimeSeriesFromXData(out Double[] rho_t, out Double rho, out Double rho2, out Double rho4, out Double rhoMax, out Int32 tt)
+        {
+            //Func<Double, Double> linearTransf;
+            //if (this.neuronType.ToString().Contains("KT"))
+            //    linearTransf = x => (x + 1.0D) / 2.0D;
+            //else
+            //    linearTransf = x => x;
+
+            Int32 t = 1, i, k;
+            Int32 n_sample = this.samplingIndices.Length;
+            tt             = this.xData[0].Length;
+            rho            = 0.0D;
+            rho2           = 0.0D;
+            rho4           = 0.0D;
+            rhoMax         = 0.0D;
+            rho_t          = new Double[tt];
+            while (t < tt)
+            {
+                rho_t[t] = 0.0D;
+                i = 0;
+                while (i < n_sample) //this.nNeurons)
+                {
+                    k = this.samplingIndices[i];
+                    // this was already commented //rho_t[t] += linearTransf(this.xData[i][t]); // transforming xData from [-1;1] to [0;1] if needed
+                    //rho_t[t] += (this.xData[i][t] > 0.0D ? 1.0D : 0.0D); // summing up only the spikes
+                    rho_t[t] += this.neuron[k].SpikeDetector(this.xData[k][t],this.xData[k][t-1]) ? 1.0D : 0.0D; // summing up only the spikes
+                    i++;
+                }
+                rho_t[t] /= n_sample;
+                rho      += rho_t[t];
+                rho2     += rho_t[t] * rho_t[t];
+                rho4     += rho_t[t] * rho_t[t] * rho_t[t] * rho_t[t];
+                if (rho_t[t] > rhoMax)
+                    rhoMax = rho_t[t];
+                t++;
+            }
+            rho  /= (Double)tt;
+            rho2 /= (Double)tt;
+            rho4 /= (Double)tt;
         }
 
         private void WriteRhoTimeSeriesFileMat(Double[] s)
         {
             String fileName = KTzHeader.GetPar_String(KTzParameters.oFile);
-            fileName += KTzHeader.CheckAndGetFileName((fileName.Length > 0 ? "_" : "") + "rho_timeseries.mat");
+            fileName = KTzHeader.CheckAndGetFileName(fileName + (fileName.Length > 0 ? "_" : "") + "rho_timeseries.mat");
             var matDataBuilder = new MatFileHandler.DataBuilder();
             Dictionary<KTzParamGroups, MatFileHandler.IVariable> simParams = KTzHeader.GetAllParamPairsAsMatlabStruct(matDataBuilder);
             using (var fileStream = new System.IO.FileStream(fileName, System.IO.FileMode.Create))
@@ -961,7 +1191,7 @@ namespace KTzV2.Sims.Network
             Int32 tMax = this.timeBin * (this.nSteps / this.timeBin); // total time
             this.countedNeuron = new Boolean[this.nNeurons];
 
-            this.timestep = 0;
+            this.timestep = -1;
             while (t < tMax)
             {
                 // running the simulation on this bin
@@ -989,7 +1219,7 @@ namespace KTzV2.Sims.Network
             //avDuration = 0;
             Int32 tMax = this.timeBin * (this.nSteps / this.timeBin); // total time
 
-            this.timestep = 0;
+            this.timestep = -1;
             while (t < tMax)
             {
                 // running the simulation on this bin
@@ -1010,11 +1240,18 @@ namespace KTzV2.Sims.Network
             return avSize;
         }
 
-        private void RunAndRecordTimeLength(Int32 timeLength)
+        private void RunAndRecordNumOfSpikesInTimeLength(Int32 timeLength)
         {
-            Int32 tt = 0, i;
+            Int32 tt = 1, i = 0;
+            // saving last state in previous window so we don't miss any spike in between time windows
+            while (i < this.nNeurons)
+            {
+                this.xData[i][0] = neuron[i].x;
+                i++;
+            }
             while (tt < timeLength)
             {
+                this.timestep++;
                 this.Update(GetNeuronIndexForStim());
 
                 i = 0;
@@ -1023,16 +1260,61 @@ namespace KTzV2.Sims.Network
                     this.xData[i][tt] = neuron[i].x;
                     i++;
                 }
-                this.timestep++;
                 tt++;
+            }
+        }
+
+        private void RunAndRecordTimeLength(Int32 timeLength)
+        {
+            Int32 tt = 1, i = 0;
+            // saving last state in previous window so we don't miss any spike in between time windows
+            while (i < this.nNeurons)
+            {
+                this.xData[i][0] = neuron[i].x;
+                i++;
+            }
+            while (tt < timeLength)
+            {
+                this.timestep++;
+                this.Update(GetNeuronIndexForStim());
+
+                i = 0;
+                while (i < this.nNeurons)
+                {
+                    this.xData[i][tt] = neuron[i].x;
+                    i++;
+                }
+                tt++;
+            }
+        }
+
+        private void RunTimeLength(Int32 timeLength)
+        {
+            int t = -1;
+            while (t < timeLength)
+            {
+                t++;
+                this.timestep++;
+                this.Update(GetNeuronIndexForStim());
             }
         }
 
         private void RunAndRecordTimeLength(Int32 timeLength, ref Double[][] cData)
         {
-            Int32 tt = 0, i;
+            Int32 tt = 1, i = 0;
+            // saving last state in previous window so we don't miss any spike in between time bins
+            if (this.timestep >= 0)
+                this.timestep--; // if the simulation already ran for at least 1 time bin, then we retrocede 1 timestep to record again the last state of the previous time window
+            while (i < this.nNeurons)
+            {
+                this.timestep++;
+                this.xData[i][0] = neuron[i].x;
+                cData[i][this.timestep] = neuron[i].x;
+                i++;
+            }
             while (tt < timeLength)
             {
+                this.timestep++;
                 this.Update(GetNeuronIndexForStim());
 
                 i = 0;
@@ -1042,7 +1324,6 @@ namespace KTzV2.Sims.Network
                     cData[i][this.timestep] = neuron[i].x;
                     i++;
                 }
-                this.timestep++;
                 tt++;
             }
         }
@@ -1073,7 +1354,7 @@ namespace KTzV2.Sims.Network
             Int32 t = 0, count = 0, tCount = 0, countTemp = 0;
             Int32 tMax = tBinLength * (this.nSteps / tBinLength); // total time
 
-            this.timestep = 0;
+            this.timestep = -1;
             while (t < tMax)
             {
                 // running the simulation on this bin
@@ -1154,7 +1435,7 @@ namespace KTzV2.Sims.Network
                 while (t < tMax)
                 {
                     // running the simulation on this bin
-                    this.timestep = t;
+                    this.timestep = t - 1;
                     this.RunAndRecordTimeLength(tBinLength);
 
                     countTemp = this.CountNonConsecutiveDataPeaks(0, tBinLength); // counts spikes only in the sampled data - which is the full data in this case
@@ -1199,7 +1480,7 @@ namespace KTzV2.Sims.Network
                 while (t < tMax)
                 {
                     // running the simulation on this bin
-                    this.timestep = t;
+                    this.timestep = t - 1;
                     this.RunAndRecordTimeLength(tBinLength);
 
                     countTemp = this.CountNonConsecutiveDataPeaks(0, tBinLength); // counts spikes only in the sampled data
@@ -1309,7 +1590,9 @@ namespace KTzV2.Sims.Network
                         matDataBuilder.NewFile(simParams.Values.Concat(new[]{
                          matDataBuilder.NewVariable("xData", matDataBuilder.NewArray(this.xData, this.xData.Length, this.xData[0].Length)),
                          matDataBuilder.NewVariable("time", matDataBuilder.NewArray(Enumerable.Range(0, this.xData[0].Length).ToArray(), 1, this.xData[0].Length)),
-                         matDataBuilder.NewVariable("file_info", matDataBuilder.NewCharArray("xData rows -> neurons; xData cols -> time")),
+                         matDataBuilder.NewVariable("spike_times", matDataBuilder.NewArray(this.spikeTimeData.ToArray(), 1, this.spikeTimeData.Count)),
+                         matDataBuilder.NewVariable("spike_neurons", matDataBuilder.NewArray(this.spikeNeuronData.ToArray(), 1, this.spikeNeuronData.Count)),
+                         matDataBuilder.NewVariable("file_info", matDataBuilder.NewCharArray(" xData rows -> neurons;\n xData cols -> time;\n spike_times -> time of each spike of the corresponding neuron in spike_neurons;\n spike_neurons -> neuron that spiked at the corresponding time given in spike_times")),
                          matDataBuilder.NewVariable("file_header", matDataBuilder.NewCharArray(header))
                         }))
                     );
@@ -1340,6 +1623,8 @@ namespace KTzV2.Sims.Network
 
                 // writing dat file
                 this.WriteDataToFileTxtInternal(oFileName + "_sim.dat", header, "\t");
+                if (this.spikeTimeData.Count > 0)
+                    Console.WriteLine("WARNING ::: spike times have been recorded but are not going to be written because output file type is Txt");
                 if (this.doWriteDif)
                     this.WriteXDataDifFileTxt(oFileName + "_dif.dat", header);
                 if (this.writeXDataCSVFile)
@@ -1884,10 +2169,10 @@ namespace KTzV2.Sims.Network
             while (i < n)
             {
                 k = this.samplingIndices[i];
-                j = 0;
+                j = 1;
                 while (j < m)
                 {
-                    if (this.xData[k][j] > 0.0D)
+                    if (this.neuron[k].SpikeDetector(this.xData[k][j],this.xData[k][j-1]))//(this.xData[k][j] > 0.0D)
                     {
                         this.countedNeuron[k] = true;
                         break;
@@ -1909,10 +2194,10 @@ namespace KTzV2.Sims.Network
             while (i < n)
             {
                 k = this.samplingIndices[i];
-                j = 0;
+                j = 1;
                 while (j < m)
                 {
-                    if ((this.xData[k][j] > 0.0D) && (!this.countedNeuron[k]))
+                    if (this.neuron[k].SpikeDetector(this.xData[k][j],this.xData[k][j-1]) && (!this.countedNeuron[k]))//((this.xData[k][j] > 0.0D) && (!this.countedNeuron[k]))
                     {
                         counter++;
                         break;
@@ -1950,6 +2235,17 @@ namespace KTzV2.Sims.Network
             return true;
         }
 
+
+        /// <summary>
+        /// counts all non-consecutive data peaks during all the time
+        /// </summary>
+        /// <param name="k">the index of the neuron</param>
+        /// <returns></returns>
+        public Int32 CountNonConsecutiveDataPeaks(Int32 k)
+        {
+            return this.CountNonConsecutiveDataPeaks(k, 0, this.xData[k].Length);
+        }
+
         /// <summary>
         /// counts the peaks of all the neurons data between t1 and t2
         /// </summary>
@@ -1977,6 +2273,28 @@ namespace KTzV2.Sims.Network
         /// <param name="t1">the first index of time</param>
         /// <param name="t2">the second index of time. if t2 == t1, then we count from t1 to the end of data</param>
         /// <returns>sum over k-th neuron spikes between t1 and t2</returns>
+        public Int32 CountNonConsecutiveDataPeaks(Int32 k, Int32 t1, Int32 t2)
+        {
+            Int32 peakCounter = 0;
+            t2--;
+            Int32 t = t1;
+            while (t < t2)
+            {
+                if (this.neuron[k].SpikeDetector(this.xData[k][t+1],this.xData[k][t]))
+                    peakCounter++;
+                t++;
+            }
+            return peakCounter;
+        }
+
+        /// <summary>
+        /// counts the peaks of the neuron k between t1 and t2
+        /// </summary>
+        /// <param name="k">the neuron index</param>
+        /// <param name="t1">the first index of time</param>
+        /// <param name="t2">the second index of time. if t2 == t1, then we count from t1 to the end of data</param>
+        /// <returns>sum over k-th neuron spikes between t1 and t2</returns>
+        /*
         public Int32 CountNonConsecutiveDataPeaks(Int32 k, Int32 t1, Int32 t2)
         {
             Int32 peakCounter = 0;
@@ -2008,16 +2326,7 @@ namespace KTzV2.Sims.Network
                 i++;
             }
             return peakCounter;
-        }
+        }/**/
 
-        /// <summary>
-        /// counts all non-consecutive data peaks during all the time
-        /// </summary>
-        /// <param name="k">the index of the neuron</param>
-        /// <returns></returns>
-        public Int32 CountNonConsecutiveDataPeaks(Int32 k)
-        {
-            return this.CountNonConsecutiveDataPeaks(k, 0, this.xData[0].Length);
-        }
     }
 }

@@ -13,9 +13,13 @@ namespace KTzV2.Synapses
         KTNoisyChemicalSynapse,
         KTDynamicChemicalSynapse,
         GapJunction,
+        GapJunctionNoisy,
+        GapJunctionRectifying,
+        GapJunctionRectifyingNoisy,
         PulseCoupling,
-        RectifyingGapJunction,
-        NormalizedPulseCoupling
+        PulseCouplingNoisy,
+        PulseCouplingSpike,
+        PulseCouplingSpikeNoisy
     }
 
     public enum NoiseType
@@ -42,20 +46,20 @@ namespace KTzV2.Synapses
         public Double dt { get; private set; }
         public SynapseParam(INeuron preNeu, INeuron postNeu, Double tauf, Double taug, Double J, Double noiseAmp, Double noiseRatio, UInt64 seed, NoiseType noiseType, Double J0, Double tauJ, Double alpha, Double u, Double dt)
         {
-            this.preSynNeuron = preNeu;
+            this.preSynNeuron  = preNeu;
             this.postSynNeuron = postNeu;
-            this.tauf = tauf;
-            this.taug = taug;
-            this.J = J;
-            this.noiseAmp = noiseAmp;
-            this.noiseRatio = noiseRatio;
-            this.seed = seed;
-            this.noiseType = noiseType;
-            this.J0 = J0;
-            this.tauJ = tauJ;
-            this.alpha = alpha;
-            this.u = u;
-            this.dt = dt;
+            this.tauf          = tauf;
+            this.taug          = taug;
+            this.J             = J;
+            this.noiseAmp      = noiseAmp;
+            this.noiseRatio    = noiseRatio;
+            this.seed          = seed;
+            this.noiseType     = noiseType;
+            this.J0            = J0;
+            this.tauJ          = tauJ;
+            this.alpha         = alpha;
+            this.u             = u;
+            this.dt            = dt;
         }
     }
 
@@ -69,14 +73,20 @@ namespace KTzV2.Synapses
                     return new KTChemicalSynapse(par.preSynNeuron, par.postSynNeuron, par.J, par.tauf, par.taug);
                 case SynapseType.KTNoisyChemicalSynapse:
                     return new KTNoisyChemicalSynapse(par.preSynNeuron, par.postSynNeuron, par.J, par.tauf, par.taug, par.noiseAmp, par.noiseRatio, par.seed, par.noiseType);
-                case SynapseType.RectifyingGapJunction:
-                case SynapseType.GapJunction:
-                    return new GapJunction(par.preSynNeuron, par.postSynNeuron, par.J, synType == SynapseType.RectifyingGapJunction);
                 case SynapseType.KTDynamicChemicalSynapse:
                     return new KTDynamicChemicalSynapse(par.preSynNeuron, par.postSynNeuron, par.J0, par.tauf, par.taug, par.alpha, par.u, par.tauJ, par.dt);
-                case SynapseType.NormalizedPulseCoupling:
+                case SynapseType.GapJunction:
+                case SynapseType.GapJunctionRectifying:
+                    return new GapJunction(par.preSynNeuron, par.postSynNeuron, par.J, synType == SynapseType.GapJunctionRectifying);
+                case SynapseType.GapJunctionNoisy:
+                case SynapseType.GapJunctionRectifyingNoisy:
+                    return new NoisyGapJunction(par.preSynNeuron, par.postSynNeuron, par.J, par.noiseAmp, par.noiseRatio, par.seed, par.noiseType, synType == SynapseType.GapJunctionRectifyingNoisy);
                 case SynapseType.PulseCoupling:
-                    return new PulseCoupling(par.preSynNeuron, par.J, synType == SynapseType.NormalizedPulseCoupling);
+                case SynapseType.PulseCouplingSpike:
+                    return new PulseCoupling(par.preSynNeuron, par.J, synType == SynapseType.PulseCouplingSpike);
+                case SynapseType.PulseCouplingNoisy:
+                case SynapseType.PulseCouplingSpikeNoisy:
+                    return new NoisyPulseCoupling(par.preSynNeuron, par.J, par.noiseAmp, par.noiseRatio, par.seed, par.noiseType, synType == SynapseType.PulseCouplingSpikeNoisy);
                 default:
                     throw new ArgumentOutOfRangeException("Unrecognized synapse type! " + synType.ToString());
             }
@@ -114,6 +124,14 @@ namespace KTzV2.Synapses
         /// </summary>
         private Double thetaJ { get; set; }
 
+        /// <summary>
+        /// creates a double exponential synapse with constant coupling conductance
+        /// </summary>
+        /// <param name="nPre">presynaptic neuron</param>
+        /// <param name="nPost">postsynaptic neuron</param>
+        /// <param name="J">coupling intensity</param>
+        /// <param name="tau_f">rise time constant</param>
+        /// <param name="tau_g">decay time constant</param>
         public KTChemicalSynapse(INeuron nPre, INeuron nPost, Double J, Double tau_f, Double tau_g)
             : base(nPre, nPost, J)
         {
@@ -295,6 +313,19 @@ namespace KTzV2.Synapses
         /// </summary>
         private Double NoiseAmp { get; set; }
 
+        /// <summary>
+        /// creates a double exponential synapse with noisy coupling conductance
+        /// </summary>
+        /// <param name="nPre">presynaptic neuron</param>
+        /// <param name="nPost">postsynaptic neuron</param>
+        /// <param name="J">coupling intensity</param>
+        /// <param name="tau_f">rise time constant</param>
+        /// <param name="tau_g">decay time constant</param>
+        /// <param name="noiseAmp">absolute amplitude of noise</param>
+        /// <param name="noiseRatio">fraction of J to use as noise amplitude</param>
+        /// <param name="seed">seed for random number generator</param>
+        /// <param name="nt">noise type parameter (must be enum)</param>
+        /// <exception cref="ArgumentOutOfRangeException">thrown when unrecognized noise type</exception>
         public KTNoisyChemicalSynapse(INeuron nPre, INeuron nPost, Double J, Double tau_f, Double tau_g, Double noiseAmp, Double noiseRatio, UInt64 seed, NoiseType nt)
             : base(nPre, nPost, J)
         {
@@ -425,8 +456,91 @@ namespace KTzV2.Synapses
     /// according to:
     /// Deterministic excitable media under Poisson drive: Power law responses,
     /// spiral waves, and dynamic range
-    /// PHYSICAL REVIEW E77, 051911 2008
+    /// PHYSICAL REVIEW E77, 051911 (2008)
     /// Tiago L. Ribeiro and Mauro Copelli
+    /// rectifying -> see Erik de Schutter book
+    /// </summary>
+    public class NoisyGapJunction : GapJunction
+    {
+        /// <summary>
+        /// random number to generate noise over J
+        /// </summary>
+        private HomogeneousRand Jnoise { get; set; }
+
+        /// <summary>
+        /// the bounds of the noise signal
+        /// </summary>
+        private Double NoiseAmp { get; set; }
+
+        /// <summary>
+        /// noisy gap junction synapse, Y = J * (Vpre - Vpost) [[ if rectifying, then Y is zero if Vpost>Vpre ]]
+        /// according to Erik de Schutter book
+        /// </summary>
+        /// <param name="nPre">the presynaptic neuron</param>
+        /// <param name="nPost">the postsynaptic neuron</param>
+        /// <param name="J">the coupling (conductance of the channel) of the presynaptic neuron with its neighbours</param>
+        /// <param name="noiseAmp">absolute amplitude of noise</param>
+        /// <param name="noiseRatio">fraction of J to use as noise amplitude</param>
+        /// <param name="seed">seed for random number generator</param>
+        /// <param name="nt">noise type parameter (must be enum)</param>
+        /// <param name="rectifying">if true, then only activates when the presynaptic potential is greater than postsynaptic potential</param>
+        /// <exception cref="ArgumentOutOfRangeException">thrown when unrecognized noise type</exception>
+        public NoisyGapJunction(INeuron nPre, INeuron nPost, Double J, Double noiseAmp, Double noiseRatio, UInt64 seed, NoiseType nt, bool rectifying=false)
+        : base(nPre, nPost, J, rectifying)
+        {
+            this.Jnoise = new HomogeneousRand(seed);
+            if (nt == NoiseType.ProportionalAmplitude)
+            {
+                this.NoiseAmp = Math.Abs(J * noiseRatio);
+                this.GetJ = this.GetJProportionalAmplitude;
+            }
+            else if (nt == NoiseType.GreaterThanJ)
+            {
+                this.NoiseAmp = Math.Abs(noiseAmp) * Math.Sign(J);
+                this.GetJ = this.GetJGreaterThanJ;
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException("Unrecognized NoiseType! " + nt.ToString());
+            }
+        }
+
+        /// <summary>
+        /// gets synaptic coupling
+        /// </summary>
+        /// <returns></returns>
+        public new Double GetCoupling()
+        {
+            return this.GetJ();
+        }
+
+        /// <summary>
+        /// returns the synaptic coupling with proportional amplitude noise
+        /// </summary>
+        /// <returns>synaptic coupling intensity</returns>
+        private Double GetJProportionalAmplitude()
+        {
+            return this.J + (this.NoiseAmp * (2.0D * this.Jnoise.GetRandomFull() - 1.0D));
+        }
+
+        /// <summary>
+        /// returns the synaptic coupling with free amplitude noise
+        /// </summary>
+        /// <returns>synaptic coupling intensity</returns>
+        private Double GetJGreaterThanJ()
+        {
+            return this.J + (this.NoiseAmp * this.Jnoise.GetRandomFull());
+        }
+    }
+
+    /// <summary>
+    /// creates a Gap Junction synapse
+    /// according to:
+    /// Deterministic excitable media under Poisson drive: Power law responses,
+    /// spiral waves, and dynamic range
+    /// PHYSICAL REVIEW E77, 051911 (2008)
+    /// Tiago L. Ribeiro and Mauro Copelli
+    /// rectifying -> see Erik de Schutter book
     /// </summary>
     public class GapJunction : ISynapse
     {
@@ -450,12 +564,21 @@ namespace KTzV2.Synapses
         /// </summary>
         private Double f { get; set; }
 
+        /// <summary>
+        /// evolves 1 time step of this synapse
+        /// </summary>
         public Action Evolve { get; private set; }
+
+        /// <summary>
+        /// gets current J value with noise
+        /// </summary>
+        protected Func<Double> GetJ { get; set; }
 
         private Double dV { get; set; }
 
         /// <summary>
-        /// constructor of a KTSynapse
+        /// noisy gap junction synapse, Y = J * (Vpre - Vpost) [[ if rectifying, then Y is zero if Vpost>Vpre ]]
+        /// according to Erik de Schutter book
         /// </summary>
         /// <param name="nPre">the presynaptic neuron</param>
         /// <param name="nPost">the postsynaptic neuron</param>
@@ -475,6 +598,7 @@ namespace KTzV2.Synapses
             {
                 this.Evolve = this.EvolveNonRectifying;
             }
+            this.GetJ = this.GetCoupling;
         }
 
         /// <summary>
@@ -486,7 +610,7 @@ namespace KTzV2.Synapses
             // in this way, it must enter as a "+" term in the sum of currents of the "dV/dT" equation
             // for the same reason, I inverted the sign to be < 0.0 in the condition check (instead of > 0.0)
             dV     = this.PreSynapticNeuron.GetMembranePotential() - this.PostSynapticNeuron.GetMembranePotential();
-            this.f = this.J * dV * (dV < 0.0D ? 0.0D : 1.0D);
+            this.f = this.GetJ() * dV * (dV < 0.0D ? 0.0D : 1.0D);
         }
 
         /// <summary>
@@ -496,7 +620,7 @@ namespace KTzV2.Synapses
         {
             // I'm doing pre - post because of the "-" sign in the definition of Calabrese & Prinz, eq 12.1, book Computational Modeling for Neuroscientists, p. 286
             // in this way, it must enter as a "+" term in the sum of currents of the "dV/dT" equation
-            this.f = this.J * (this.PreSynapticNeuron.GetMembranePotential() - this.PostSynapticNeuron.GetMembranePotential());
+            this.f = this.GetJ() * (this.PreSynapticNeuron.GetMembranePotential() - this.PostSynapticNeuron.GetMembranePotential());
         }
 
         /// <summary>
@@ -508,7 +632,7 @@ namespace KTzV2.Synapses
             return this.f;
         }
 
-        public Double GetCoupling()
+        public virtual Double GetCoupling()
         {
             return this.J;
         }
@@ -518,7 +642,77 @@ namespace KTzV2.Synapses
         /// </summary>
         public void ResetSignal()
         {
-            return;
+            this.f = 0.0;
+        }
+    }
+
+    /// <summary>
+    /// pulse coupling
+    /// I(t) = J*V_pre
+    /// </summary>
+    public class NoisyPulseCoupling : PulseCoupling
+    {
+        /// <summary>
+        /// random number to generate noise over J
+        /// </summary>
+        private HomogeneousRand Jnoise { get; set; }
+
+        /// <summary>
+        /// the bounds of the noise signal
+        /// </summary>
+        private Double NoiseAmp { get; set; }
+
+        /// <summary>
+        /// pulse coupling
+        /// </summary>
+        /// <param name="nPre">presynaptic neuron</param>
+        /// <param name="J">conductance of the channel</param>
+        public NoisyPulseCoupling(INeuron nPre, Double J, Double noiseAmp, Double noiseRatio, UInt64 seed, NoiseType nt, bool normalizePulse = false)
+        : base(nPre, J, normalizePulse)
+        {
+            this.Jnoise = new HomogeneousRand(seed);
+
+            if (nt == NoiseType.ProportionalAmplitude)
+            {
+                this.NoiseAmp = Math.Abs(J * noiseRatio);
+                this.GetJ = this.GetJProportionalAmplitude;
+            }
+            else if (nt == NoiseType.GreaterThanJ)
+            {
+                this.NoiseAmp = Math.Abs(noiseAmp) * Math.Sign(J);
+                this.GetJ = this.GetJGreaterThanJ;
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException("Unrecognized NoiseType! " + nt.ToString());
+            }
+        }
+
+        /// <summary>
+        /// gets coupling intensity of this synapse
+        /// </summary>
+        /// <returns>coupling intensity</returns>
+        public new Double GetCoupling()
+        {
+            return this.GetJ();
+        }
+
+        /// <summary>
+        /// returns the synaptic coupling with proportional amplitude noise
+        /// </summary>
+        /// <returns>synaptic coupling intensity</returns>
+        private Double GetJProportionalAmplitude()
+        {
+            return this.J + (this.NoiseAmp * (2.0D * this.Jnoise.GetRandomFull() - 1.0D));
+        }
+
+        /// <summary>
+        /// returns the synaptic coupling with free amplitude noise
+        /// </summary>
+        /// <returns>synaptic coupling intensity</returns>
+        private Double GetJGreaterThanJ()
+        {
+            return this.J + (this.NoiseAmp * this.Jnoise.GetRandomFull());
         }
     }
 
@@ -546,9 +740,17 @@ namespace KTzV2.Synapses
         /// <summary>
         /// stores the state of the synapse according to neuron states in the previous timestep in order to correct interaction timing
         /// </summary>
-        private Double f { get; set; }
+        protected Double f { get; set; }
 
+        /// <summary>
+        /// Evolves 1 time step of this synapse
+        /// </summary>
         public Action Evolve { get; private set; }
+
+        /// <summary>
+        /// gets current J value with noise
+        /// </summary>
+        protected Func<Double> GetJ { get; set; }
 
         /// <summary>
         /// pulse coupling
@@ -568,19 +770,25 @@ namespace KTzV2.Synapses
             {
                 this.Evolve = this.EvolveLocal;
             }
+            this.GetJ = this.GetCoupling;
         }
 
         /// <summary>
         /// evaluates one timestep of this synapse
+        /// considering a spike input (1=spike, 0=no spike)
         /// </summary>
         public void EvolveLocalNormalized()
         {
-            this.f = this.J * (this.PreSynapticNeuron.GetMembranePotential()>0?1.0D:0.0D);
+            this.f = this.GetJ() * (this.PreSynapticNeuron.GetMembranePotential()>0.0?1.0D:0.0D);
         }
 
+        /// <summary>
+        /// evaluates one timestep of this synapse
+        /// considering a membrane potential input
+        /// </summary>
         public void EvolveLocal()
         {
-            this.f = this.J * this.PreSynapticNeuron.GetMembranePotential();
+            this.f = this.GetJ() * this.PreSynapticNeuron.GetMembranePotential();
         }
 
         /// <summary>
@@ -592,7 +800,11 @@ namespace KTzV2.Synapses
             return this.f;
         }
 
-        public Double GetCoupling()
+        /// <summary>
+        /// gets coupling intensity of this synapse
+        /// </summary>
+        /// <returns>coupling intensity</returns>
+        public virtual Double GetCoupling()
         {
             return this.J;
         }
@@ -602,7 +814,7 @@ namespace KTzV2.Synapses
         /// </summary>
         public void ResetSignal()
         {
-            return;
+            this.f = 0.0;
         }
     }
 

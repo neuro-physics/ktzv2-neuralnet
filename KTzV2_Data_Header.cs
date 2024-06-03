@@ -394,7 +394,8 @@ namespace KTzV2.Data.Header
                 case KTzParameters.wCSV:
                 case KTzParameters.wData:
                 case KTzParameters.wDif:
-                case KTzParameters.wSpk:
+                case KTzParameters.wAvalDist:
+                case KTzParameters.saveSpikeTimes:
                 case KTzParameters.netDir:
                 case KTzParameters.wObs:
                 case KTzParameters.writeRhoTS:
@@ -928,8 +929,11 @@ namespace KTzV2.Data.Header
             KTzHeader.ParamDescription.Add(KTzParameters.wCSV, "if wData=Yes, then wCSV=Yes writes a CSV file with the x_i(t) data" + Environment.NewLine + KTzHeader.GetEnumListStr<KTzV2.Data.YesOrNoAnswer>());
             KTzHeader.AddPar(KTzParameters.wCSV, (Int32)KTzV2.Data.YesOrNoAnswer.No, KTzParamGroups.Simulation, typeof(KTzV2.Data.YesOrNoAnswer));
 
-            KTzHeader.ParamDescription.Add(KTzParameters.wSpk, "choose whether the program will run a simulation only to write a spike distribution file in the case of dynamics simulation" + Environment.NewLine + KTzHeader.GetEnumListStr<KTzV2.Data.YesOrNoAnswer>());
-            KTzHeader.AddPar(KTzParameters.wSpk, (Int32)KTzV2.Data.YesOrNoAnswer.Yes, KTzParamGroups.Simulation, typeof(KTzV2.Data.YesOrNoAnswer));
+            KTzHeader.ParamDescription.Add(KTzParameters.wAvalDist, "choose whether the program will run a simulation only to write an avalanche spike distribution file in the case of dynamics simulation" + Environment.NewLine + KTzHeader.GetEnumListStr<KTzV2.Data.YesOrNoAnswer>());
+            KTzHeader.AddPar(KTzParameters.wAvalDist, (Int32)KTzV2.Data.YesOrNoAnswer.Yes, KTzParamGroups.Simulation, typeof(KTzV2.Data.YesOrNoAnswer));
+
+            KTzHeader.ParamDescription.Add(KTzParameters.saveSpikeTimes, "chooses whether to save spike times for each neuron during a simulation" + Environment.NewLine + KTzHeader.GetEnumListStr<KTzV2.Data.YesOrNoAnswer>());
+            KTzHeader.AddPar(KTzParameters.saveSpikeTimes, (Int32)KTzV2.Data.YesOrNoAnswer.Yes, KTzParamGroups.Simulation, typeof(KTzV2.Data.YesOrNoAnswer));
 
             KTzHeader.ParamDescription.Add(KTzParameters.wObs, "write observations of the avalanche sizes for Bifurcation sim type for each (par1,par2) pair" + Environment.NewLine + KTzHeader.GetEnumListStr<KTzV2.Data.YesOrNoAnswer>());
             KTzHeader.AddPar(KTzParameters.wObs, (Int32)KTzV2.Data.YesOrNoAnswer.No, KTzParamGroups.Simulation, typeof(KTzV2.Data.YesOrNoAnswer));
@@ -1004,7 +1008,7 @@ namespace KTzV2.Data.Header
             KTzHeader.AddPar(KTzParameters.ParamForRange, (Int32)KTzV2.ParamForRangeInDynamicsSim.J, KTzParamGroups.Simulation, typeof(KTzV2.ParamForRangeInDynamicsSim));
 
             KTzHeader.ParamDescription.Add(KTzParameters.bifWrite, "OnTheFly == writes data after each pair (I,J); OnTheEnd == writes after everything is finished" + Environment.NewLine + KTzHeader.GetEnumListStr<KTzV2.BifurcationWritePolicy>());
-            KTzHeader.AddPar(KTzParameters.bifWrite, (Int32)KTzV2.BifurcationWritePolicy.OnTheEnd, KTzParamGroups.Simulation, typeof(KTzV2.BifurcationWritePolicy));
+            KTzHeader.AddPar(KTzParameters.bifWrite, (Int32)KTzV2.BifurcationWritePolicy.InTheEnd, KTzParamGroups.Simulation, typeof(KTzV2.BifurcationWritePolicy));
 
             KTzHeader.ParamDescription.Add(KTzParameters.indChoice, "iStim!=-1 forces indChoice==Fixed; method for choosing stimulus index" + Environment.NewLine + KTzHeader.GetEnumListStr<KTzV2.Sims.Network.StimulusIndexChoice>());
             KTzHeader.AddPar(KTzParameters.indChoice, (Int32)KTzV2.Sims.Network.StimulusIndexChoice.Fixed, KTzParamGroups.Stimulus, typeof(KTzV2.Sims.Network.StimulusIndexChoice));
@@ -1775,9 +1779,13 @@ namespace KTzV2.Data.Header
         /// </summary>
         wCSV,
         /// <summary>
-        /// Simulation parameter - choose whether the program will run a simulation only to write a spike distribution file in the case of dynamics simulation
+        /// Simulation parameter - choose whether the program will run a simulation only to write an avalanche spike distribution file in the case of dynamics simulation
         /// </summary>
-        wSpk,
+        wAvalDist,
+        /// <summary>
+        /// Simulation parameter - chooses whether to save the spike times for each neuron in a simulation
+        /// </summary>
+        saveSpikeTimes,
         /// <summary>
         /// Debug parameter - write observations of the avalanche sizes for Bifurcation sim type for Debug purposes
         /// </summary>
