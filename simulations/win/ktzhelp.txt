@@ -138,7 +138,7 @@ ALLOWED PARAMETERS
 # nTheta = 100		number of values for threshold of SI(RS) element in bifurcation simulation
 # 
 # 
-# ThetaRange = 		range of values for threshold of SI(RS) element in bifurcation simulation  (comma separated list of: min:max:dx OR range(min:max:dx) OR linspace(min:max:nx) OR logspace(min:max:nx))
+# ThetaRange = 		range of values for threshold of SI(RS) element in bifurcation simulation  (comma separated list of: min:max:dx OR range(min:max:dx) OR linspace(min,max,nx) OR logspace(min,max,nx))
 # 
 #
 #--------------------------------------------------------
@@ -226,9 +226,13 @@ ALLOWED PARAMETERS
 #				1 = KTNoisyChemicalSynapse
 #				2 = KTDynamicChemicalSynapse
 #				3 = GapJunction
-#				4 = PulseCoupling
-#				5 = RectifyingGapJunction
-#				6 = NormalizedPulseCoupling
+#				4 = GapJunctionNoisy
+#				5 = GapJunctionRectifying
+#				6 = GapJunctionRectifyingNoisy
+#				7 = PulseCoupling
+#				8 = PulseCouplingNoisy
+#				9 = PulseCouplingSpike
+#				10 = PulseCouplingSpikeNoisy
 # 
 # 
 # noiseType = ProportionalAmplitude		type of the synaptic noise
@@ -247,10 +251,10 @@ ALLOWED PARAMETERS
 #				1 = AdjMatrix
 # 
 # 
-# JRange = 		range values for J parameter when running Bifurcation simulation; if set ignores minJ, maxJ, nJ (comma separated list of: min:max:dx OR range(min:max:dx) OR linspace(min:max:nx) OR logspace(min:max:nx))
+# JRange = 		range values for J parameter when running Bifurcation simulation; if set ignores minJ, maxJ, nJ (comma separated list of: min:max:dx OR range(min:max:dx) OR linspace(min,max,nx) OR logspace(min,max,nx))
 # 
 # 
-# alphaRange = 		range values for alpha parameter when running Bifurcation simulation; if set ignores minalpha, maxalpha, nalpha (comma separated list of: min:max:dx OR range(min:max:dx) OR linspace(min:max:nx) OR logspace(min:max:nx))
+# alphaRange = 		range values for alpha parameter when running Bifurcation simulation; if set ignores minalpha, maxalpha, nalpha (comma separated list of: min:max:dx OR range(min:max:dx) OR linspace(min,max,nx) OR logspace(min,max,nx))
 # 
 #
 #--------------------------------------------------------
@@ -307,13 +311,14 @@ ALLOWED PARAMETERS
 #				0 = Fixed
 #				1 = SquareCenter
 #				2 = Random
-#				3 = MostConnected
+#				3 = MultipleRandom
+#				4 = MostConnected
 # 
 # 
-# IRange = 		range values for I parameter when running Bifurcation simulation; if set ignores minI, maxI, nI (comma separated list of: min:max:dx OR range(min:max:dx) OR linspace(min:max:nx) OR logspace(min:max:nx))
+# IRange = 		range values for I parameter when running Bifurcation simulation; if set ignores minI, maxI, nI (comma separated list of: min:max:dx OR range(min:max:dx) OR linspace(min,max,nx) OR logspace(min,max,nx))
 # 
 # 
-# rRange = 		log-spaced range values for r parameter when running Bifurcation simulation; if set ignores minr, maxr, nr (comma separated list of: min:max:dx OR range(min:max:dx) OR linspace(min:max:nx) OR logspace(min:max:nx))
+# rRange = 		log-spaced range values for r parameter when running Bifurcation simulation; if set ignores minr, maxr, nr (comma separated list of: min:max:dx OR range(min:max:dx) OR linspace(min,max,nx) OR logspace(min,max,nx))
 # 
 #
 #----------------------------------------------------------
@@ -331,6 +336,11 @@ ALLOWED PARAMETERS
 # nStart = 0		timestep in which the network starts to be recorded
 # 
 # 
+# simTimeScheme = Free		CAUTION: simulation will become VERY SLOW for small Poisson Rate r; if 'ProportionalToPoissonRate' then (nSteps - nStartStep) = 10/(r*N), where r-> Poisson rate; N=Lx*Ly*Lz (number of neurons)
+#				0 = ProportionalToPoissonRate
+#				1 = Free
+# 
+# 
 # tBin = 20		size of the bin (in timesteps) to divide nSteps in order to run the simulation
 # 
 # 
@@ -344,7 +354,12 @@ ALLOWED PARAMETERS
 #				1 = Yes
 # 
 # 
-# wSpk = Yes		choose whether the program will run a simulation only to write a spike distribution file in the case of dynamics simulation
+# wAvalDist = Yes		choose whether the program will run a simulation only to write an avalanche spike distribution file in the case of dynamics simulation
+#				0 = No
+#				1 = Yes
+# 
+# 
+# saveSpikeTimes = Yes		chooses whether to save spike times for each neuron during a simulation
 #				0 = No
 #				1 = Yes
 # 
@@ -379,7 +394,7 @@ ALLOWED PARAMETERS
 #				0 = Dynamics
 #				1 = DynamicsWithinParamRange
 #				2 = Bifurcation
-#				3 = KTzPhaseDiagram
+#				3 = DEPRECATEDKTzPhaseDiagram
 # 
 # 
 # dynType = NetworkReset		each avalanche is generated independently of each other or after a time window
@@ -400,9 +415,9 @@ ALLOWED PARAMETERS
 #				4 = Theta
 # 
 # 
-# bifWrite = OnTheEnd		OnTheFly == writes data after each pair (I,J); OnTheEnd == writes after everything is finished
+# bifWrite = InTheEnd		OnTheFly == writes data after each pair (I,J); OnTheEnd == writes after everything is finished
 #				0 = OnTheFly
-#				1 = OnTheEnd
+#				1 = InTheEnd
 # 
 # 
 # outAvgMode = OverRealizations		determines whether the output average should be taken over many avalanches or just temporal average (for bifurcation simulations)

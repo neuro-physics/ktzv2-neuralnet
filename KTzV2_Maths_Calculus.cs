@@ -12,15 +12,25 @@ namespace KTzV2.Maths.Calculus
     {
         public Double[] y { get; private set; }
         public Double h { get; private set; }
-        private Func<Int32, Double> GetValue_Internal { get; set; }
         public Func<Double> GetError { get; private set; }
+        private Func<Int32, Double> GetValue_Internal { get; set; }
 
         public FirstOrderDerivative(Double[] x, Double[] y, DerivativeMethod m)
-            : this(Math.Abs(x[1]-x[0]), y, m)
         {
+            if (x.Length != y.Length)
+                throw new ArgumentException("x and y must have the same length");
+            if (y.Length < 2)
+                SetNaNReturnValues();
+            else
+                this.DefaultConstructor(Math.Abs(x[1]-x[0]), y, m);
         }
 
         public FirstOrderDerivative(Double dx, Double[] y, DerivativeMethod m)
+        {
+            this.DefaultConstructor(dx, y, m);
+        }
+
+        private void DefaultConstructor(Double dx, Double[] y, DerivativeMethod m)
         {
             this.y = y;
             this.h = dx;
@@ -30,8 +40,7 @@ namespace KTzV2.Maths.Calculus
                 {
                     Console.WriteLine("FirstOrderDerivative: y.Length < 3");
                     //throw new ArgumentException("FirstOrderDerivative: y.Length < 3");
-                    this.GetValue_Internal = (x) => Double.NaN;
-                    this.GetError = () => Double.NaN;
+                    SetNaNReturnValues();
                 }
                 else
                 {
@@ -45,8 +54,7 @@ namespace KTzV2.Maths.Calculus
                 {
                     Console.WriteLine("FirstOrderDerivative: y.Length < 5");
                     //throw new ArgumentException("FirstOrderDerivative: y.Length < 5");
-                    this.GetValue_Internal = (x) => Double.NaN;
-                    this.GetError = () => Double.NaN;
+                    SetNaNReturnValues();
                 }
                 else
                 {
@@ -60,8 +68,7 @@ namespace KTzV2.Maths.Calculus
                 {
                     Console.WriteLine("FirstOrderDerivative: y.Length < 3");
                     //throw new ArgumentException("FirstOrderDerivative: y.Length < 3");
-                    this.GetValue_Internal = (x) => Double.NaN;
-                    this.GetError = () => Double.NaN;
+                    SetNaNReturnValues();
                 }
                 else
                 {
@@ -69,6 +76,14 @@ namespace KTzV2.Maths.Calculus
                     this.GetError = this.Oh4CentralError;
                 }
             }
+        }
+
+        private void SetNaNReturnValues()
+        {
+            this.GetValue_Internal = (x) => Double.NaN;
+            this.GetError = () => Double.NaN;
+            this.y = new double[]{Double.NaN};
+            this.h = Double.NaN;
         }
 
         public Double[] GetDerivative()

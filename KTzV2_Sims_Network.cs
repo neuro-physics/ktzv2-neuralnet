@@ -244,10 +244,13 @@ namespace KTzV2.Sims.Network
             // adjusting total simulation time if needed
             if ((simTimeScheme == SimulationTimeScheme.ProportionalToPoissonRate) && (this.stimulusType == StimulusType.PoissonProcess))
             {
-                var T       = (int)(10.0D / (double)(this.poissonRate * this.nNeurons));
-                this.nSteps = this.nStartStep + T;
-                KTzHeader.SetPar(KTzParameters.nSteps, this.nSteps);
-                Console.WriteLine("WARNING ::: Auto-adjusting total simulation time to nSteps = nStartStep + {0:D}",T);
+                var T = this.nStartStep + (int)(10.0D / (double)(this.poissonRate * this.nNeurons));
+                if (T > this.nSteps)
+                {
+                    this.nSteps = T;
+                    KTzHeader.SetPar(KTzParameters.nSteps, this.nSteps);
+                    Console.WriteLine("WARNING ::: Auto-adjusting total simulation time to nSteps = nStartStep + {0:D}",T);
+                }
             }
 
             /***

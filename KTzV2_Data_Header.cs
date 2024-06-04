@@ -1079,9 +1079,10 @@ namespace KTzV2.Data.Header
         public static void GetMinMaxNFromLinspaceStr(String linspaceStr, out Double xMin, out Double xMax, out Int32 nx)
         {
             String[] ss_parts = linspaceStr.Replace("logspace(","").Replace("linspace(", "").Replace(")", "").Split(':');
-            xMin = Convert.ToDouble(ss_parts[0]);
-            xMax = Convert.ToDouble(ss_parts[1]);
-            nx = Convert.ToInt32(ss_parts[2]);
+            Func<String,String> get_number = s => System.Text.RegularExpressions.Regex.Replace(s, "[^.efEF0-9+-]", "");
+            xMin = Convert.ToDouble(get_number(ss_parts[0]));
+            xMax = Convert.ToDouble(get_number(ss_parts[1]));
+            nx   = Convert.ToInt32( get_number(ss_parts[2]));
         }
 
         public static Double[] GetRangeFor(KTzParameters p)
@@ -1109,12 +1110,10 @@ namespace KTzV2.Data.Header
                 foreach (String ss in sr)
                 {
                     String myss = ss.ToLower();
-                    if ((myss.Contains(':')) || (myss.Contains("range")))
+                    if (myss.Contains("range"))
                     {
                         KTzHeader.GetMinMaxNFromStr(myss, out xMin, out xMax, out nx);
-                        range.AddRange(
-                            (p == KTzParameters.r ? KTzHeader.GetMinMaxLog10Range(xMin, xMax, nx) : KTzHeader.GetMinMaxRange(xMin, xMax, nx))
-                            );
+                        range.AddRange((p == KTzParameters.r ? KTzHeader.GetMinMaxLog10Range(xMin, xMax, nx) : KTzHeader.GetMinMaxRange(xMin, xMax, nx)));
                     }
                     else
                     {
@@ -1130,7 +1129,13 @@ namespace KTzV2.Data.Header
                         }
                         else
                         {
-                            range.Add(Convert.ToDouble(myss));
+                            if (myss.Contains(':')) // matlab-like range
+                            {
+                                KTzHeader.GetMinMaxNFromStr(myss, out xMin, out xMax, out nx);
+                                range.AddRange((p == KTzParameters.r ? KTzHeader.GetMinMaxLog10Range(xMin, xMax, nx) : KTzHeader.GetMinMaxRange(xMin, xMax, nx)));
+                            }
+                            else
+                                range.Add(Convert.ToDouble(myss));
                         }
                         
                     }
