@@ -28,11 +28,11 @@ namespace KTzV2.Stimuli
         {
             switch (st)
             {
-                case StimulusType.Delta: return new DeltaStimulus(t0, stimulusIntensity);
-                case StimulusType.DeltaTrain: return new DeltaTrainStimulus(t0, stimulusIntensity, deltat, n);
-                case StimulusType.PoissonProcess: return new PoissonProcess(r, stimulusIntensity, intensityStdDev);
-                case StimulusType.DeltaWhenInactive: return new DeltaWhenInactive(stimulusIntensity);
-                case StimulusType.None: return new ExternalStimulusBase();
+                case StimulusType.Delta             : return new DeltaStimulus(t0, stimulusIntensity);
+                case StimulusType.DeltaTrain        : return new DeltaTrainStimulus(t0, stimulusIntensity, deltat, n);
+                case StimulusType.PoissonProcess    : return new PoissonProcess(r, stimulusIntensity, intensityStdDev);
+                case StimulusType.DeltaWhenInactive : return new DeltaWhenInactive(t0, stimulusIntensity);
+                case StimulusType.None              : return new ExternalStimulusBase();
             }
             throw new ArgumentOutOfRangeException("unrecognized stimulus type!");
         }
@@ -87,8 +87,9 @@ namespace KTzV2.Stimuli
         private Double StimulusIntensity { get; set; }
         //public Int32 timeForStimulus { get; private set; }
 
-        public DeltaWhenInactive(Double stimulusIntensity)
+        public DeltaWhenInactive(Int32 t0, Double stimulusIntensity)
         {
+            this.timeForStimulus   = t0;
             this.StimulusIntensity = stimulusIntensity;
         }
 
@@ -96,6 +97,7 @@ namespace KTzV2.Stimuli
         {
             if (timestep == this.timeForStimulus)
             {
+                //Console.WriteLine("estimulo t={0:d}",timestep);
                 return this.StimulusIntensity;
             }
             else

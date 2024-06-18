@@ -313,7 +313,8 @@ namespace KTzV2
 
                     if ((stt == KTzV2.Stimuli.StimulusType.Delta) || (stt == KTzV2.Stimuli.StimulusType.DeltaWhenInactive))
                     {
-                        Console.WriteLine("WARNING: the program will run {0} independent avalanches since stimType is Delta or DeltaWhenInactive", nSim);
+                        if (KTzHeader.GetPar_Int32(KTzParameters.outAvgMode) == (Int32)KTzV2.OutputAverageMode.OverRealizations)
+                            Console.WriteLine("WARNING: the program will run {0} independent avalanches since stimType is Delta or DeltaWhenInactive", nSim);
                     }
                     else
                     {
@@ -351,15 +352,15 @@ namespace KTzV2
                     Int32 i, j;
 
                     // resetting the values of all the data variables
-                    Double[][] mMax = new Double[nPar2][];
-                    Double[][] m = new Double[nPar2][];
-                    Double[][] mStdDev = new Double[nPar2][];
-                    Double[][] chi = new Double[nPar2][];
+                    Double[][] mMax      = new Double[nPar2][];
+                    Double[][] m         = new Double[nPar2][];
+                    Double[][] mStdDev   = new Double[nPar2][];
+                    Double[][] chi       = new Double[nPar2][];
                     Double[][] chiStdDev = new Double[nPar2][];
-                    Double[][] U4 = new Double[nPar2][];
-                    Double[][] U4StdDev = new Double[nPar2][];
-                    Double[][] dU4 = new Double[nPar2][];
-                    Double[][] dU4Err = new Double[nPar2][];/**/
+                    Double[][] U4        = new Double[nPar2][];
+                    Double[][] U4StdDev  = new Double[nPar2][];
+                    Double[][] dU4       = new Double[nPar2][];
+                    Double[][] dU4Err    = new Double[nPar2][];/**/
                     InitiateBifurcationDataVariables(nPar2, nPar1, out mMax, out m, out mStdDev, out chi, out chiStdDev, out U4, out U4StdDev, out dU4, out dU4Err);
 
                     // adjusting the output file header
@@ -371,9 +372,9 @@ namespace KTzV2
                     fHeader += "# " + par1 + " = as expressed in the data below" + Environment.NewLine;
                     fHeader += "# " + par2 + " = as expressed in the data below" + Environment.NewLine;
                     fHeader += "# total simulation steps = " + KTzHeader.GetPar_Int32(KTzParameters.nSteps).ToString();
-                    String varName = cVar == CountVariable.NumberOfNeurons ? "nNeu" : "nSpk";
+                    String varName         = cVar == CountVariable.NumberOfNeurons ? "nNeu" : "nSpk";
                     String[] oFileColNames = new String[] { par2Name, par1Name, varName + "_max", varName + "_M", varName + "_SD", "chi_M", "chi_SD", "U4_M", "U4_SD", "dU4", "dU4_Err" };
-                    String outputStrFmt = String.Join("\t", Enumerable.Range(0, oFileColNames.Length).Select((x) => "{" + Convert.ToString(x) + ":0.00000000e+000}").ToArray());
+                    String outputStrFmt    = String.Join("\t", Enumerable.Range(0, oFileColNames.Length).Select((x) => "{" + Convert.ToString(x) + ":0.00000000e+000}").ToArray());
 
                     System.IO.StreamWriter sw;
 
@@ -426,15 +427,16 @@ namespace KTzV2
                             if (wAvalObs)
                             {
                                 ts.WriteObservations(KTzHeader.CheckAndGetFileName(String.Format("avs_{4}_{0}{1}_{2}{3}", par1Name, Par1[j], par2Name, Par2[i], filePrefix)),
-                                    "# avalanches for the following simulation" + Environment.NewLine + KTzProg.GetOutputFileHeader() + "#aval_size", (KTzV2.Data.Header.OutputFileFormat)KTzV2.Data.Header.KTzHeader.GetPar_Int32(KTzParameters.oFileFormat));
+                                    "# avalanches for the following simulation" + Environment.NewLine + KTzProg.GetOutputFileHeader() + "#aval_size",
+                                    (KTzV2.Data.Header.OutputFileFormat)KTzV2.Data.Header.KTzHeader.GetPar_Int32(KTzParameters.oFileFormat));
                             }
-                            mMax[i][j] = ts.mMax;
-                            m[i][j] = ts.m;
-                            mStdDev[i][j] = ts.mStdDev;
-                            chi[i][j] = ts.chi;
+                            mMax[i][j]      = ts.mMax;
+                            m[i][j]         = ts.m;
+                            mStdDev[i][j]   = ts.mStdDev;
+                            chi[i][j]       = ts.chi;
                             chiStdDev[i][j] = ts.chiStdDev;
-                            U4[i][j] = ts.U4;
-                            U4StdDev[i][j] = ts.U4StdDev;
+                            U4[i][j]        = ts.U4;
+                            U4StdDev[i][j]  = ts.U4StdDev;
 
                             if (wPol == BifurcationWritePolicy.OnTheFly)
                             {

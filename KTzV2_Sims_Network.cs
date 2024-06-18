@@ -66,6 +66,8 @@ namespace KTzV2.Sims.Network
         private Double[][] xData;
         private List<Int32> spikeNeuronData;
         private List<Int32> spikeTimeData;
+        // number of spikes M in a give time step t
+        private Int32 M_t;
         private Boolean hasRunned;
         //private KTNeuron[] neuron;
         private INeuron[] neuron;
@@ -103,6 +105,7 @@ namespace KTzV2.Sims.Network
         public Action<Int32?> RunForAvalanches { get; private set; }
         private Func<Int32> GetNeuronIndexForStim { get; set; }
         private Func<Int32> RunSingleAvalanche { get; set; }
+        private Action<Int32> SetNextStimTimeIfNeeded { get; set;}
         private Action<Int32> Update { get; set; }
         private Action<Int32> UpdateDuringTransient { get; set; }
         private Action<Double[]> WriteRhoTimeSeriesFile { get; set; }
@@ -575,6 +578,11 @@ namespace KTzV2.Sims.Network
             return this.elAdjMatVal[i];
         }
 
+        private void NoNextStimulus(Int32 dt)
+        {
+            return;
+        }
+
         private void prepareStimulus()
         {
             // neurons are already prepared at this point
@@ -582,26 +590,26 @@ namespace KTzV2.Sims.Network
             {
                 if (this.indChoice == StimulusIndexChoice.SquareCenter)
                 {
-                    this.neuronIndStim = this.GetSquareCenterIndex();
-                    this.GetNeuronIndexForStim = GetNeuronIndForStimSimple;
+                    this.neuronIndStim         = this.GetSquareCenterIndex();
+                    this.GetNeuronIndexForStim = this.GetNeuronIndForStimSimple;
                 }
                 else if (this.indChoice == StimulusIndexChoice.Fixed)
                 {
-                    this.neuronIndStim = this.GetSquareCenterIndex();
-                    this.GetNeuronIndexForStim = GetNeuronIndForStimSimple;
+                    this.neuronIndStim         = this.GetSquareCenterIndex();
+                    this.GetNeuronIndexForStim = this.GetNeuronIndForStimSimple;
                 }
                 else if (this.indChoice == StimulusIndexChoice.MostConnected)
                 {
-                    this.neuronIndStim = this.GetMostConnectedNeuronIndex();
-                    this.GetNeuronIndexForStim = GetNeuronIndForStimSimple;
+                    this.neuronIndStim         = this.GetMostConnectedNeuronIndex();
+                    this.GetNeuronIndexForStim = this.GetNeuronIndForStimSimple;
                 }
                 else if (this.indChoice == StimulusIndexChoice.Random)
                 {
-                    this.GetNeuronIndexForStim = GetNeuronIndForStimRandom;
+                    this.GetNeuronIndexForStim = this.GetNeuronIndForStimRandom;
                 }
                 else if (this.indChoice == StimulusIndexChoice.MultipleRandom)
                 {
-                    this.GetNeuronIndexForStim = GetNeuronIndForStimAll;
+                    this.GetNeuronIndexForStim = this.GetNeuronIndForStimAll;
                 }
                 else
                 {
@@ -616,6 +624,13 @@ namespace KTzV2.Sims.Network
 
             // each time we simulate, we create a new stimulus vector
             this.stimulus = FExternalStimulus.Get(this.stimulusType, this.tForStimulus, this.stimulusAmp, this.deltaTrainDt, this.nSteps / this.deltaTrainDt, 1.0 / this.poissonRate, this.stimulusStdDev);
+            if (this.saveSpikeTimes && (this.stimulusType == StimulusType.DeltaWhenInactive))
+            {
+                this.SetNextStimTimeIfNeeded = this.stimulus.SetNextStimulusTime;
+            }
+            else
+                this.SetNextStimTimeIfNeeded = this.NoNextStimulus;
+            //if (this.stimulus.timeForStimulus < (this.nStartStep+1))
         }
 
         private Int32 GetSquareCenterIndex()
@@ -707,15 +722,19 @@ namespace KTzV2.Sims.Network
             }
             // evaluating the membrane potential of each neuron
             k = 0;
+            this.M_t = 0;
             while (k < this.samplingIndices.Length)
             {
                 j = this.samplingIndices[k];
                 if (j == i)
-                    neuron[j].Evolve();
-                else
                     neuron[j].Evolve(stimulus.GetSignal(this.timestep));
+                else
+                    neuron[j].Evolve();
                 if (neuron[j].SpikeDetector())
+                {
+                    this.M_t += 1;
                     this.SaveSpikeTime(j, this.timestep);
+                }
                 k++;
             }
             k = 0;
@@ -723,9 +742,11 @@ namespace KTzV2.Sims.Network
             {
                 j = this.unsampledIndices[k];
                 if (j == i)
-                    neuron[j].Evolve();
-                else
                     neuron[j].Evolve(stimulus.GetSignal(this.timestep));
+                else
+                    neuron[j].Evolve();
+                if (neuron[j].SpikeDetector())
+                    this.M_t += 1;
                 k++;
             }
         }
@@ -770,19 +791,26 @@ namespace KTzV2.Sims.Network
                 k++;
             }
             // evaluating the membrane potential of each neuron
-            k = 0;
+            k   = 0;
+            this.M_t = 0; // counts number of spikes in this iteration
             while (k < this.samplingIndices.Length)
             {
                 j = this.samplingIndices[k];
                 neuron[j].Evolve(stimulus.GetSignal(this.timestep));
                 if (neuron[j].SpikeDetector())
+                {
+                    this.M_t += 1;
                     this.SaveSpikeTime(j, this.timestep);
+                }
                 k++;
             }
             k = 0;
             while (k < this.unsampledIndices.Length)
             {
-                neuron[this.unsampledIndices[k]].Evolve(stimulus.GetSignal(this.timestep));
+                j = this.unsampledIndices[k];
+                neuron[j].Evolve(stimulus.GetSignal(this.timestep));
+                if (neuron[j].SpikeDetector())
+                    this.M_t += 1;
                 k++;
             }
         }
@@ -831,7 +859,7 @@ namespace KTzV2.Sims.Network
                     i++;
                 }
             }
-
+            this.M_t               = 0;
             this.spikeNeuronData   = new List<int>();
             this.spikeTimeData     = new List<int>();
             this.spikeDistribution = new List<int>();
@@ -877,7 +905,9 @@ namespace KTzV2.Sims.Network
                     this.RunAndRecordTimeLength(this.nSteps - this.nStartStep + 1);
             }
             else
+            {
                 this.RunTimeLength(this.nSteps - this.nStartStep + 1);
+            }
 
             hasRunned = true;
         }
@@ -1002,6 +1032,8 @@ namespace KTzV2.Sims.Network
                     rho4 += rho_tmp * rho_tmp * rho_tmp * rho_tmp;
                 }
             }
+            if (this.spikeTimeData.Count == 1)
+                rho_t_list.Add(t0); // it didn't enter the loop
             rho_t   = rho_t_list.ToArray();
             t_total = rho_t.Length;
             rho    /= (Double)t_total;
@@ -1064,7 +1096,9 @@ namespace KTzV2.Sims.Network
                     matDataBuilder.NewFile(simParams.Values.Concat(new[]{
                          matDataBuilder.NewVariable("rho", matDataBuilder.NewArray(s, s.Length, 1)),
                          matDataBuilder.NewVariable("time", matDataBuilder.NewArray(Enumerable.Range(0, s.Length).ToArray(), s.Length, 1)),
-                         matDataBuilder.NewVariable("file_info", matDataBuilder.NewCharArray("rho: spike count time series"))
+                         matDataBuilder.NewVariable("spike_times", matDataBuilder.NewArray(this.spikeTimeData.ToArray(), 1, this.spikeTimeData.Count)),
+                         matDataBuilder.NewVariable("spike_neurons", matDataBuilder.NewArray(this.spikeNeuronData.ToArray(), 1, this.spikeNeuronData.Count)),
+                         matDataBuilder.NewVariable("file_info", matDataBuilder.NewCharArray("rho: spike count time series; spike_times: spike times making rho time series; spike_neurons: neurons that spiked at each corresponding spike_times"))
                     }))
                 );
             }
@@ -1320,7 +1354,12 @@ namespace KTzV2.Sims.Network
             {
                 t++;
                 this.timestep++;
-                this.Update(GetNeuronIndexForStim());
+                this.Update(GetNeuronIndexForStim()); // updates this.M_t with the detected number of spikes in this time step
+                if (this.M_t > 0) // spike was detected, we delay next stimulus
+                {
+                    //Console.WriteLine("t={0:d}   nspks={1:d}",this.timestep,this.M_t);
+                    this.SetNextStimTimeIfNeeded(this.timestep + this.timeBin);
+                }
             }
         }
 
