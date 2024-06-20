@@ -1,16 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Collections.Generic;
 //using System.Threading.Tasks;
+using KTzV2.Stimuli;
 using KTzV2.Neurons;
 using KTzV2.Synapses;
-using KTzV2.Stimuli;
+using KTzV2.Data;
 using KTzV2.Data.Header;
 using KTzV2.Maths.Random;
 using KTzV2.Maths.Matrices;
 using KTzV2.Maths.Matrices.AdjacencyMatrix;
-using KTzV2.Data;
 using MatFileHandler;
 
 namespace KTzV2.Sims.Network
