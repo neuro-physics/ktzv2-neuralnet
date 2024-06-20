@@ -9,7 +9,7 @@ namespace KTzV2.Sims.SingleNeuron
 {
     class KTzNeuronSimulator
     {
-        KTzNeuron neuron;
+        //KTzNeuron neuron;
 
         Int32 t0;
         Int32 tTotal;
@@ -28,7 +28,7 @@ namespace KTzV2.Sims.SingleNeuron
             Int32 t = 0;
             while (t < tTotal)
             {
-                neuron.Evolve();
+                //neuron.Evolve();
                 t++;
             }
         }
@@ -48,7 +48,7 @@ namespace KTzV2.Sims.SingleNeuron
 
         private void CreateNeuron()
         {
-            this.neuron = new KTzNeuron(0, KTzHeader.GetPar_Double(KTzParameters.K), KTzHeader.GetPar_Double(KTzParameters.T), KTzHeader.GetPar_Double(KTzParameters.d), KTzHeader.GetPar_Double(KTzParameters.l), KTzHeader.GetPar_Double(KTzParameters.xR), KTzHeader.GetPar_Double(KTzParameters.x0), KTzHeader.GetPar_Double(KTzParameters.y0), KTzHeader.GetPar_Double(KTzParameters.z0));
+            //this.neuron = new KTzNeuron(0, KTzHeader.GetPar_Double(KTzParameters.K), KTzHeader.GetPar_Double(KTzParameters.T), KTzHeader.GetPar_Double(KTzParameters.d), KTzHeader.GetPar_Double(KTzParameters.l), KTzHeader.GetPar_Double(KTzParameters.xR), KTzHeader.GetPar_Double(KTzParameters.x0), KTzHeader.GetPar_Double(KTzParameters.y0), KTzHeader.GetPar_Double(KTzParameters.z0));
         }
 
         /// <summary>

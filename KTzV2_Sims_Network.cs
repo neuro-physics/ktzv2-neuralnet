@@ -520,8 +520,9 @@ namespace KTzV2.Sims.Network
                 this.H         = KTzHeader.GetPar_Double(KTzParameters.H);
                 this.Q         = KTzHeader.GetPar_Double(KTzParameters.Q);
                 this.Theta     = KTzHeader.GetPar_Double(KTzParameters.Theta);
+                var normInput  = (KTzV2.Data.YesOrNoAnswer)KTzHeader.GetPar_Int32(KTzParameters.avgInp) == KTzV2.Data.YesOrNoAnswer.Yes;
                 this.neuron[i] = NeuronFactory.GetKTNeuron(this.neuronType,
-                                                           new NeuronParam(i, this.K, this.T, this.d, this.l, this.xR, this.H, this.x0p[i], this.y0p[i], this.z0p[i], this.Theta, Q: this.Q)
+                                                           new NeuronParam(i, this.K, this.T, this.d, this.l, this.xR, this.H, this.x0p[i], this.y0p[i], this.z0p[i], this.Theta, normalizeInput: normInput, Q: this.Q)
                                                            );
                 this.countedNeuron[i] = false;
                 i++;

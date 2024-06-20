@@ -101,19 +101,21 @@ namespace KTzV2.Neurons
             switch (neuron)
             {
                 case NeuronType.KTH:
-                    return new KTSimple(par.ind, par.K, par.T, par.H, par.x0, par.y0);
+                    return new KTSimple(par.ind, par.K, par.T, par.H, par.x0, par.y0, par.normalizeInput);
                 case NeuronType.KTHLog:
-                    return new KTLogSimple(par.ind, par.K, par.T, par.H, par.x0, par.y0);
+                    return new KTLogSimple(par.ind, par.K, par.T, par.H, par.x0, par.y0, par.normalizeInput);
                 case NeuronType.KTz:
-                    return new KTzNeuron(par.ind, par.K, par.T, par.d, par.l, par.xR, par.x0, par.y0, par.z0);
+                    return new KTzNeuron(par.ind, par.K, par.T, par.d, par.l, par.xR, par.x0, par.y0, par.z0, par.normalizeInput);
                 case NeuronType.KTz2Tanh:
-                    return new KTz2Tanh(par.ind, par.K, par.T, par.d, par.l, par.xR, par.H, par.Q, par.x0, par.y0, par.z0);
+                    return new KTz2Tanh(par.ind, par.K, par.T, par.d, par.l, par.xR, par.H, par.Q, par.x0, par.y0, par.z0, par.normalizeInput);
                 case NeuronType.KTzLog:
-                    return new KTzLogNeuron(par.ind, par.K, par.T, par.d, par.l, par.xR, par.x0, par.y0, par.z0);
+                    return new KTzLogNeuron(par.ind, par.K, par.T, par.d, par.l, par.xR, par.x0, par.y0, par.z0, par.normalizeInput);
+                /*
                 case NeuronType.KTzMF:
                     return new KTzNeuronAvgInp(par.ind, par.K, par.T, par.d, par.l, par.xR, par.x0, par.y0, par.z0);
                 case NeuronType.KTzLogMF:
                     return new KTzLogNeuronAvgInp(par.ind, par.K, par.T, par.d, par.l, par.xR, par.x0, par.y0, par.z0);
+                */
                 case NeuronType.SIElement:
                     return new SIElement(par.ind, par.Theta, par.x0);
                 case NeuronType.GLNeuron:
@@ -556,8 +558,8 @@ namespace KTzV2.Neurons
         /// <param name="x_init">initial value of x</param>
         /// <param name="y_init">initial value of y</param>
         /// <param name="z_init">initial value of z</param>
-        public KTz2Tanh(Int32 ind, Double K, Double T, Double d, Double l, Double xR, Double H, Double Q, Double x_init, Double y_init, Double z_init)
-            : base(ind,K,T,H,x_init,y_init)
+        public KTz2Tanh(Int32 ind, Double K, Double T, Double d, Double l, Double xR, Double H, Double Q, Double x_init, Double y_init, Double z_init, bool normalizeInput)
+            : base(ind,K,T,H,x_init,y_init, normalizeInput)
         {
             this.d = d;
             this.l = l;
@@ -645,8 +647,8 @@ namespace KTzV2.Neurons
         /// <param name="x_init">initial value of x</param>
         /// <param name="y_init">initial value of y</param>
         /// <param name="z_init">initial value of z</param>
-        public KTzLogNeuron(Int32 ind, Double K, Double T, Double d, Double l, Double xR, Double x_init, Double y_init, Double z_init)
-            : base(ind, K, T, x_init, y_init)
+        public KTzLogNeuron(Int32 ind, Double K, Double T, Double d, Double l, Double xR, Double x_init, Double y_init, Double z_init, bool normalizeInput)
+            : base(ind, K, T, x_init, y_init, normalizeInput)
         {
             this.d = d;
             this.l = l;
@@ -737,8 +739,8 @@ namespace KTzV2.Neurons
         /// <param name="x_init">initial value of x</param>
         /// <param name="y_init">initial value of y</param>
         /// <param name="z_init">initial value of z</param>
-        public KTzNeuron(Int32 ind, Double K, Double T, Double d, Double l, Double xR, Double x_init, Double y_init, Double z_init)
-            : base(ind, K, T, x_init, y_init)
+        public KTzNeuron(Int32 ind, Double K, Double T, Double d, Double l, Double xR, Double x_init, Double y_init, Double z_init, bool normalizeInput)
+            : base(ind, K, T, x_init, y_init, normalizeInput)
         {
             this.d = d;
             this.l = l;
@@ -786,7 +788,7 @@ namespace KTzV2.Neurons
     /// <summary>
     /// implements the neuron of the reference A simple model for excitable and bursting elements with average input
     /// </summary>
-    public class KTzLogNeuronAvgInp : KTNeuron
+    /*public class KTzLogNeuronAvgInp : KTNeuron
     {
         /// <summary>
         /// parameter delta
@@ -857,7 +859,7 @@ namespace KTzV2.Neurons
         {
             this.SumInputSignal();
             this.x_prev = this.x;
-            this.x = logFun((this.x - this.K * this.y + this.z + I + this.Isyn / (this.Input.Count + 1)) / this.T);
+            this.x = logFun((this.x - this.K * this.y + this.z + I + this.Isyn / this.Input.Count) / this.T);
             this.y = this.x_prev;
             this.z = (1.0 - this.d) * this.z - this.l * (this.x_prev - this.xR);
         }
@@ -872,12 +874,12 @@ namespace KTzV2.Neurons
             this.z_init = ic[2];
             this.z = ic[2];
         }
-    }
+    }/**/
 
     /// <summary>
     /// implements the neuron of the reference A simple model for excitable and bursting elements with average input
     /// </summary>
-    public class KTzNeuronAvgInp : KTNeuron
+    /*public class KTzNeuronAvgInp : KTNeuron
     {
         /// <summary>
         /// parameter delta
@@ -944,7 +946,7 @@ namespace KTzV2.Neurons
         {
             this.SumInputSignal();
             this.x_prev = this.x;
-            this.x = Math.Tanh((this.x - this.K * this.y + this.z + I + this.Isyn / (this.Input.Count + 1)) / this.T);
+            this.x = Math.Tanh((this.x - this.K * this.y + this.z + I + this.Isyn / this.Input.Count) / this.T);
             this.y = this.x_prev;
             this.z = (1.0 - this.d) * this.z - this.l * (this.x_prev - this.xR);
         }
@@ -959,7 +961,7 @@ namespace KTzV2.Neurons
             this.z_init = ic[2];
             this.z = ic[2];
         }
-    }
+    }/**/
 
 
     /// <summary>
@@ -980,8 +982,8 @@ namespace KTzV2.Neurons
         /// <param name="H">H parameter</param>
         /// <param name="x_init">x (membrane potential) initial value</param>
         /// <param name="y_init">y (recurrent variable) initial value</param>
-        public KTLogSimple(Int32 ind, Double K, Double T, Double H, Double x_init, Double y_init)
-            : base(ind, K, T, x_init, y_init)
+        public KTLogSimple(Int32 ind, Double K, Double T, Double H, Double x_init, Double y_init, bool normalizeInput)
+            : base(ind, K, T, x_init, y_init, normalizeInput)
         {
             this.H = H;
         }
@@ -1033,8 +1035,8 @@ namespace KTzV2.Neurons
         /// <param name="H">H parameter</param>
         /// <param name="x_init">x (membrane potential) initial value</param>
         /// <param name="y_init">y (recurrent variable) initial value</param>
-        public KTSimple(Int32 ind, Double K, Double T, Double H, Double x_init, Double y_init)
-            : base(ind, K, T, x_init, y_init)
+        public KTSimple(Int32 ind, Double K, Double T, Double H, Double x_init, Double y_init, bool normalizeInput)
+            : base(ind, K, T, x_init, y_init, normalizeInput)
         {
             this.H = H;
         }
@@ -1121,6 +1123,8 @@ namespace KTzV2.Neurons
         /// </summary>
         public Double y_init { get; private set; }
 
+        protected Action SumInputSignal { get; set; }
+
         /// <summary>
         /// KTNeuron constructor
         /// </summary>
@@ -1128,7 +1132,7 @@ namespace KTzV2.Neurons
         /// <param name="T">T parameter</param>
         /// <param name="x_init">x (membrane potential) initial value</param>
         /// <param name="y_init">y (recurrent variable) initial value</param>
-        protected KTNeuron(Int32 ind, Double K, Double T, Double x_init, Double y_init)
+        protected KTNeuron(Int32 ind, Double K, Double T, Double x_init, Double y_init, bool normalizeInput)
         {
             this.Index = ind;
             this.K = K;
@@ -1136,6 +1140,10 @@ namespace KTzV2.Neurons
             this.x_init = this.x = this.x_prev = x_init;
             this.y_init = this.y = y_init;
             this.Input = new List<ISynapse>();
+            if (normalizeInput)
+                this.SumInputSignal = this.SumInputSignalNormalized;
+            else
+                this.SumInputSignal = this.SumInputSignalNotNorm;
         }
 
         /// <summary>
@@ -1159,7 +1167,7 @@ namespace KTzV2.Neurons
         /// <summary>
         /// sums all the neighbours output signals and stores it at this.Isyn
         /// </summary>
-        protected void SumInputSignal()
+        private void SumInputSignalNotNorm()
         {
             Int32 i = 0, n = this.Input.Count;
             this.Isyn = 0.0;
@@ -1168,6 +1176,18 @@ namespace KTzV2.Neurons
                 this.Isyn += this.Input[i].GetSignal();
                 i++;
             }
+        }
+
+        private void SumInputSignalNormalized()
+        {
+            Int32 i = 0, n = this.Input.Count;
+            this.Isyn = 0.0;
+            while (i < n)
+            {
+                this.Isyn += this.Input[i].GetSignal();
+                i++;
+            }
+            this.Isyn /= this.Input.Count;
         }
 
         /// <summary>
